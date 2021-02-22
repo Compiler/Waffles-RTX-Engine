@@ -5,10 +5,10 @@ namespace Waffles{
 
     void EngineCore::load(){
         DEBUG("EngineCore Loading...");
-        const char* appName = "Vulkan Raytracing";
-        _window = new Waffles::Window(400, 400.0 / (16.0 / 9.0), appName);
+        const char* appName = "Waffles-RTX-PBR";
+        _window = new Waffles::Window(720, 720.0 / (16.0 / 9.0), appName);
 
-       _vulkanInstance = Startup::createVKInstance("Vulkan RayTracing", "Waffles");
+       _vulkanInstance = Startup::createVKInstance("Waffles-RTX-PBR", "Waffles");
        validatationLayersAssert();
     }
 
