@@ -45,7 +45,7 @@ namespace Waffles{
 
     }
 
-    bool VulkanInstance::_isRTXEnabledGPU(VkPhysicalDevice& dev){
+    bool VulkanInstance::_isRTXEnabledGPU(VkPhysicalDevice dev){
 
         return 1;
     }
@@ -65,14 +65,14 @@ namespace Waffles{
 
         for (const auto& device : devices) {
             if (_isRTXEnabledGPU(device)) {
-                physicalDevice = device;
+                _physicalDevice = device;
                 LOG("RTX Enabled device set");
                 break;
             }
         }
 
-        if (physicalDevice == VK_NULL_HANDLE) {
-            throw std::runtime_error("failed to find a suitable GPU!");
+        if (_physicalDevice == VK_NULL_HANDLE) {
+            ERROR("No RTX Enabled GPU support found.");
         }
         
     }

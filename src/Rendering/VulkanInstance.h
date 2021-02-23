@@ -15,7 +15,7 @@ namespace Waffles{
             VkPhysicalDevice _physicalDevice;
             void _validatationLayersAssert();
             void _setPhysicalDevice();
-            bool _isRTXEnabledGPU(VkPhysicalDevice&);
+            bool _isRTXEnabledGPU(VkPhysicalDevice);
 
         public:
 
