@@ -45,6 +45,12 @@ namespace Waffles{
 
     }
 
+    bool VulkanInstance::_isRTXEnabledGPU(VkPhysicalDevice& dev){
+
+        return 1;
+    }
+
+
 
     void VulkanInstance::_setPhysicalDevice(){
         VkPhysicalDevice physDev = VK_NULL_HANDLE;
@@ -56,6 +62,18 @@ namespace Waffles{
         }
         std::vector<VkPhysicalDevice> devices(devCount);
         vkEnumeratePhysicalDevices(_vulkanInstance, &devCount, devices.data());
+
+        for (const auto& device : devices) {
+            if (_isRTXEnabledGPU(device)) {
+                physicalDevice = device;
+                LOG("RTX Enabled device set");
+                break;
+            }
+        }
+
+        if (physicalDevice == VK_NULL_HANDLE) {
+            throw std::runtime_error("failed to find a suitable GPU!");
+        }
         
     }
 

@@ -5,3 +5,5 @@ constexpr bool __DEBUG_MODE = true;
 constexpr bool __DEBUG_MODE = false;
 #endif
 
+#define WAFFLES_ASSERT(x) 
+
