@@ -8,6 +8,8 @@ namespace Waffles{
         const char* appName = "Waffles-RTX-PBR";
         _window = new Waffles::Window(720, 720.0 / (16.0 / 9.0), appName);
         _vkInstance.load();
+
+        GLFWCallbacks::initCallBacks(_window);
        
     }
 
@@ -15,7 +17,9 @@ namespace Waffles{
 
 
     void EngineCore::update(){
-
+        
+        InputManager::clear();
+        glfwPollEvents();
     }
 
     void EngineCore::render(){

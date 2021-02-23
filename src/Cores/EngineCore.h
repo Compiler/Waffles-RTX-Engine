@@ -7,6 +7,8 @@
 #include <vector>
 #include <cstring>
 #include <Rendering/VulkanInstance.h>
+#include <Tools/Input/InputManager.h>
+#include <Tools/Input/GLFWCallbacks.h>
 namespace Waffles{
 
     class EngineCore{
