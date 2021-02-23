@@ -4,7 +4,7 @@ C++_VERSION = c++17
 CXXFLAGS = -std=$(C++_VERSION) -Wall -w -g -static-libgcc -static-libstdc++
 
 OUT_DIR = bin
-LAUNCHER_NAME = LukeRTX
+LAUNCHER_NAME = WafflesRTX
 SRC_DIR = src
 ENTRY_POINT = src/main.cpp
 

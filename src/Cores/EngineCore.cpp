@@ -9,10 +9,11 @@ namespace Waffles{
         _window = new Waffles::Window(720, 720.0 / (16.0 / 9.0), appName);
 
        _vulkanInstance = Startup::createVKInstance("Waffles-RTX-PBR", "Waffles");
-       validatationLayersAssert();
+       _validatationLayersAssert();
+       _setPhysicalDevice();
     }
 
-    void EngineCore::validatationLayersAssert(){
+    void EngineCore::_validatationLayersAssert(){
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
@@ -47,6 +48,15 @@ namespace Waffles{
 
 
     }
+
+
+    void EngineCore::_setPhysicalDevice(){
+        VkPhysicalDevice physDev = VK_NULL_HANDLE;
+        uint32_t devCount = 0;
+        vkEnumeratePhysicalDevices(_vulkanInstance, &devCount, nullptr);
+        
+    }
+
 
     void EngineCore::update(){
 

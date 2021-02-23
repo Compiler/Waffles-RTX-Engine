@@ -13,7 +13,10 @@ namespace Waffles{
         private:
             Window* _window;
             VkInstance _vulkanInstance;
-            void validatationLayersAssert();
+            VkPhysicalDevice _physicalDevice;
+            void _validatationLayersAssert();
+            void _setPhysicalDevice();
+
 
         public:
             void load();
