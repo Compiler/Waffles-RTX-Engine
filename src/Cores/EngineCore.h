@@ -6,16 +6,15 @@
 #include <Tools/Logging.h>
 #include <vector>
 #include <cstring>
+#include <Rendering/VulkanInstance.h>
 namespace Waffles{
 
     class EngineCore{
 
         private:
             Window* _window;
-            VkInstance _vulkanInstance;
-            VkPhysicalDevice _physicalDevice;
-            void _validatationLayersAssert();
-            void _setPhysicalDevice();
+            VulkanInstance _vkInstance;
+
 
 
         public:

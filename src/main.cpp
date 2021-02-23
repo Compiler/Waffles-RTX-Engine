@@ -17,7 +17,7 @@ int main(){
         core.render();
     }
 
-    WARN("Program Unloading...");
+    UNLOAD_LOG("Program Unloading...");
     core.unload();
 
     return 0;

@@ -32,7 +32,7 @@ LINKS = -lglfw3 -lgdi32 -lvulkan-1
 
 #========================OBJECTS========================#
 STARTUP_OBJS = $(OUT_DIR)/Startup.o
-RENDERING_OBJS = $(OUT_DIR)/Window.o
+RENDERING_OBJS = $(OUT_DIR)/Window.o $(OUT_DIR)/VulkanInstance.o
 CORE_OBJS = $(OUT_DIR)/RenderCore.o $(OUT_DIR)/EngineCore.o
 OBJS = $(CORE_OBJS) $(ENGINE_CORE_OBJS) $(RENDERING_OBJS) $(STARTUP_OBJS)
 
