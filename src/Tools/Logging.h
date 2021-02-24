@@ -1,4 +1,6 @@
 #pragma once
+#include <cassert>
+
 #if __INTELLISENSE__
 #pragma diag_suppress 2486
 #endif
@@ -23,7 +25,7 @@
 #define STR_FROM_INT(x) #x
 #define STR(x) STR_FROM_INT(x)
 #define test(...) printf(ANSI_COLOR_BOLD_RED "TEST::" __FILE__ ":" STR(__LINE__) "\t" ANSI_COLOR_RESET ANSI_COLOR_RED __VA_ARGS__); printf(ANSI_COLOR_RESET "\n")
-#define ERROR(...) printf(ANSI_COLOR_BOLD_RED "ERROR::" __FILE__ ":" STR(__LINE__) "\t" ANSI_COLOR_RESET ANSI_COLOR_RED __VA_ARGS__); printf(ANSI_COLOR_RESET "\n")
+#define ERROR(...) printf(ANSI_COLOR_BOLD_RED "ERROR::" __FILE__ ":" STR(__LINE__) "\t" ANSI_COLOR_RESET ANSI_COLOR_RED __VA_ARGS__); printf(ANSI_COLOR_RESET "\n"); assert(false)
 #define LOG(...) printf(ANSI_COLOR_BOLD_CYAN "LOG::" __FILE__ ":" STR(__LINE__) "\t" ANSI_COLOR_RESET ANSI_COLOR_CYAN __VA_ARGS__); printf(ANSI_COLOR_RESET "\n")
 #define DEBUG(...) printf(ANSI_COLOR_BOLD_GREEN "LOG::" __FILE__ ":" STR(__LINE__) "\t" ANSI_COLOR_RESET ANSI_COLOR_GREEN __VA_ARGS__); printf(ANSI_COLOR_RESET "\n")
 #define WARN(...) printf(ANSI_COLOR_BOLD_YELLOW "WARN::" __FILE__ ":" STR(__LINE__) "\t" ANSI_COLOR_RESET ANSI_COLOR_YELLOW __VA_ARGS__); printf(ANSI_COLOR_RESET "\n")

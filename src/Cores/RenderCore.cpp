@@ -9,6 +9,7 @@ namespace Waffles{
     void RenderCore::update(){
         _engineCore.update();
         glfwPollEvents();
+        
 
     }   
 

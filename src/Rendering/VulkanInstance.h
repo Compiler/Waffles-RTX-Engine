@@ -8,19 +8,17 @@
 #include <string>
 
 #define DEBUG_FUNC(x) LOG("Starting %s", #x); x; LOG("Ending %s", #x)
-
-//#include <optional>
 namespace Waffles{
     struct OptionalPair{
         uint32_t index;
         bool set = false;
     };
     struct QueueFamilyIndices {
-        //std::optional<uint32_t> graphicsFamily;
         OptionalPair graphicsFamily;
+        OptionalPair presentFamily;
         
         bool isComplete() {
-            return graphicsFamily.set;
+            return graphicsFamily.set && presentFamily.set;
         }
     };
 
@@ -37,7 +35,7 @@ namespace Waffles{
             void _setPhysicalDevice();
             bool _isRTXEnabledGPU(VkPhysicalDevice);
             void _createLogicalDevice();
-            void _createSurface();
+            void _createSurface(GLFWwindow* window);
 
             QueueFamilyIndices _getQueueFamilies(VkPhysicalDevice);
 
@@ -47,7 +45,7 @@ namespace Waffles{
 
         public:
 
-            void load();
+            void load(GLFWwindow* window);
 
 
             void unload();

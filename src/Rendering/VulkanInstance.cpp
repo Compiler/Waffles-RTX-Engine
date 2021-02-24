@@ -2,13 +2,13 @@
 
 namespace Waffles{
 
-    void VulkanInstance::load(){
+    void VulkanInstance::load(GLFWwindow* window){
         _vulkanInstance = Startup::createVKInstance("Waffles-RTX-PBR", "Waffles");
         LOG("Vulkan Instance retreived");
         DEBUG_FUNC(_validatationLayersAssert());
         DEBUG_FUNC(_setPhysicalDevice());
         DEBUG_FUNC(_createLogicalDevice());
-        DEBUG_FUNC(_createSurface());
+        DEBUG_FUNC(_createSurface(window));
     }
 
 
@@ -58,11 +58,19 @@ namespace Waffles{
 
         std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+        
+        VkBool32 presentSupport = false;
+        
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
                 indices.graphicsFamily.index = i;
                 indices.graphicsFamily.set = true;
+            }
+            if (presentSupport) {
+                indices.presentFamily.index = i;
+                indices.presentFamily.set = true;
             }
             if(indices.isComplete()) break;
             i++;
@@ -105,8 +113,10 @@ namespace Waffles{
 
     }
 
-    void VulkanInstance::_createSurface(){
-
+    void VulkanInstance::_createSurface(GLFWwindow* window){
+        if (glfwCreateWindowSurface(_vulkanInstance, window, nullptr, &_surface) != VK_SUCCESS) {
+            ERROR("failed to create window surface!");
+        }
     }
 
 
@@ -150,6 +160,7 @@ namespace Waffles{
 
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
+        vkDestroySurfaceKHR(_vulkanInstance, _surface, nullptr);
         vkDestroyInstance(_vulkanInstance, nullptr);
         vkDestroyDevice(_logicalDevice, nullptr);
 
