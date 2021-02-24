@@ -8,14 +8,16 @@
 #include <string>
 //#include <optional>
 namespace Waffles{
-
+    struct OptionalPair{
+        uint32_t index;
+        bool set = false;
+    };
     struct QueueFamilyIndices {
         //std::optional<uint32_t> graphicsFamily;
-        uint32_t graphicsFamilyIndex;
-        bool gf_set = false;
+        OptionalPair graphicsFamily;
         
         bool isComplete() {
-            return gf_set;
+            return graphicsFamily.set;
         }
     };
 
@@ -25,6 +27,7 @@ namespace Waffles{
             VkInstance _vulkanInstance;
             VkPhysicalDevice _physicalDevice;
             VkDevice _logicalDevice;
+            VkQueue _graphicsQueue;
             bool _activateLayers = false;
             void _validatationLayersAssert();
             void _setPhysicalDevice();

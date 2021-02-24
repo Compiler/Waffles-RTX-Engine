@@ -59,8 +59,8 @@ namespace Waffles{
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
-                indices.graphicsFamilyIndex = i;
-                indices.gf_set = true;
+                indices.graphicsFamily.index = i;
+                indices.graphicsFamily.set = true;
             }
             if(indices.isComplete()) break;
             i++;
@@ -73,7 +73,7 @@ namespace Waffles{
 
         VkDeviceQueueCreateInfo queueCreateInfo{};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = indices.graphicsFamilyIndex;
+        queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.index;
         queueCreateInfo.queueCount = 1;
         float queuePriority = 1.0f;
         queueCreateInfo.pQueuePriorities = &queuePriority;
@@ -93,6 +93,12 @@ namespace Waffles{
             createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
             createInfo.ppEnabledLayerNames = _validationLayers.data();
         }else createInfo.enabledLayerCount = 0;
+
+        if (vkCreateDevice(_physicalDevice, &createInfo, nullptr, &_logicalDevice) != VK_SUCCESS) {
+            ERROR("failed to create logical device!");
+        }else {LOG("Created logical device.");}
+
+        vkGetDeviceQueue(_logicalDevice, indices.graphicsFamily.index, 0, &_graphicsQueue); //retrieve queue handle
 
 
     }
@@ -136,6 +142,7 @@ namespace Waffles{
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
         vkDestroyInstance(_vulkanInstance, nullptr);
+        vkDestroyDevice(_logicalDevice, nullptr);
 
     }
 }
