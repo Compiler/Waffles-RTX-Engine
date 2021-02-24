@@ -9,45 +9,15 @@ namespace Waffles{
         _setPhysicalDevice();
     }
 
-    void VulkanInstance::_validatationLayersAssert(){
-        uint32_t layerCount;
-        vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
-        std::vector<VkLayerProperties> availableLayers(layerCount);
-        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-        bool validationLayersSupported = false;
-        const std::vector<const char*> _validationLayers = {"VK_LAYER_KHRONOS_validation"};
-        for (const char* layerName : _validationLayers) {
-            bool layerFound = false;
-
-            for (const auto& layerProperties : availableLayers) {
-                if (strcmp(layerName, layerProperties.layerName) == 0) {
-                    layerFound = true;
-                    break;
-                }
-            }
-
-            if (!layerFound) {
-                validationLayersSupported = false;
-            }
-        }
-
-        validationLayersSupported = true;
-
-        #ifdef DEBUG_MODE
-            if(!validationLayersSupported){
-                ERROR("Debug mode activated but couldn't initialize validation layers");
-            }
-        #else
-            DEBUG("Validation layers initialized");
-        #endif
-
-
-    }
 
     bool VulkanInstance::_isRTXEnabledGPU(VkPhysicalDevice dev){
-
-        return 1;
+        VkPhysicalDeviceProperties deviceProperties;
+        VkPhysicalDeviceFeatures deviceFeatures;
+        vkGetPhysicalDeviceProperties(dev, &deviceProperties);
+        vkGetPhysicalDeviceFeatures(dev, &deviceFeatures);
+        QueueFamilyIndices indices = findQueueFamilies(device);
+        return indices.isComplete();
     }
 
 
@@ -75,6 +45,58 @@ namespace Waffles{
             ERROR("No RTX Enabled GPU support found.");
         }
         
+    }
+
+    uint32_t VulkanInstance::getQueueFamilies(VkPhysicalDevice device){
+        QueueFamilyIndices indices;
+        uint32_t queueFamilyCount = 0;
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+        std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+        int i = 0;
+        for (const auto& queueFamily : queueFamilies) {
+            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) indices.graphicsFamily = i;
+            if(QueueFamilyIndices.isComplete()) break;
+            i++;
+        }
+        return indices;
+    }
+
+        void VulkanInstance::_validatationLayersAssert(){
+            uint32_t layerCount;
+            vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+            std::vector<VkLayerProperties> availableLayers(layerCount);
+            vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+            bool validationLayersSupported = false;
+            const std::vector<const char*> _validationLayers = {"VK_LAYER_KHRONOS_validation"};
+            for (const char* layerName : _validationLayers) {
+                bool layerFound = false;
+
+                for (const auto& layerProperties : availableLayers) {
+                    if (strcmp(layerName, layerProperties.layerName) == 0) {
+                        layerFound = true;
+                        break;
+                    }
+                }
+
+                if (!layerFound) {
+                    validationLayersSupported = false;
+                }
+            }
+
+            validationLayersSupported = true;
+
+            #ifdef DEBUG_MODE
+                if(!validationLayersSupported){
+                    ERROR("Debug mode activated but couldn't initialize validation layers");
+                }
+            #else
+                DEBUG("Validation layers initialized");
+            #endif
+
+
     }
 
     void VulkanInstance::unload(){
