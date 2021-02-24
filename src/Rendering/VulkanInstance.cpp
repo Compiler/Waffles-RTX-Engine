@@ -3,10 +3,13 @@
 namespace Waffles{
 
     void VulkanInstance::load(){
-
         _vulkanInstance = Startup::createVKInstance("Waffles-RTX-PBR", "Waffles");
-        _validatationLayersAssert();
-        _setPhysicalDevice();
+        LOG("Vulkan Instance retreived");
+        _validationLayers.push_back(std::string("VK_LAYER_KHRONOS_validation").c_str());
+        DEBUG_FUNC(_validatationLayersAssert());
+        DEBUG_FUNC(_setPhysicalDevice());
+        DEBUG_FUNC(_createLogicalDevice());
+        DEBUG_FUNC(_createSurface());
     }
 
 
@@ -103,6 +106,11 @@ namespace Waffles{
 
     }
 
+    void VulkanInstance::_createSurface(){
+
+    }
+
+
     void VulkanInstance::_validatationLayersAssert(){
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -110,6 +118,8 @@ namespace Waffles{
         std::vector<VkLayerProperties> availableLayers(layerCount);
         vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
         bool validationLayersSupported = false;
+        LOG("Validation layers size: %d", _validationLayers.size());
+        LOG("Validation layers size: %s", _validationLayers.at(0));
         for (const char* layerName : _validationLayers) {
             bool layerFound = false;
 

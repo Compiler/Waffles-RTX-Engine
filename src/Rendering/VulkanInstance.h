@@ -6,6 +6,9 @@
 #include <Tools/Logging.h>
 #include <cstring>
 #include <string>
+
+#define DEBUG_FUNC(x) LOG("Starting %s", #x); x; LOG("Ending %s", #x)
+
 //#include <optional>
 namespace Waffles{
     struct OptionalPair{
@@ -28,16 +31,17 @@ namespace Waffles{
             VkPhysicalDevice _physicalDevice;
             VkDevice _logicalDevice;
             VkQueue _graphicsQueue;
+            VkSurfaceKHR _surface;
             bool _activateLayers = false;
             void _validatationLayersAssert();
             void _setPhysicalDevice();
             bool _isRTXEnabledGPU(VkPhysicalDevice);
             void _createLogicalDevice();
+            void _createSurface();
+
             QueueFamilyIndices _getQueueFamilies(VkPhysicalDevice);
 
-            const std::vector<const char*> _validationLayers = {
-                "VK_LAYER_KHRONOS_validation"
-            };
+            std::vector<const char*> _validationLayers;
 
         public:
 

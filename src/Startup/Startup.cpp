@@ -24,6 +24,7 @@ namespace Waffles{
         createInfo.enabledLayerCount = 0;
         VkInstance vulkanInstance;
         VkResult result = vkCreateInstance(&createInfo, nullptr, &vulkanInstance);
+        LOG("%d enabled glfw extensions", glfwExtensionCount);
 
         if(result != VK_SUCCESS){
             ERROR("Failed to create vulkan instance");
