@@ -16,7 +16,7 @@ namespace Waffles{
         VkPhysicalDeviceFeatures deviceFeatures;
         vkGetPhysicalDeviceProperties(dev, &deviceProperties);
         vkGetPhysicalDeviceFeatures(dev, &deviceFeatures);
-        QueueFamilyIndices indices = getQueueFamilies(dev);
+        QueueFamilyIndices indices = _getQueueFamilies(dev);
         return indices.isComplete();
     }
 
@@ -47,7 +47,7 @@ namespace Waffles{
         
     }
 
-    QueueFamilyIndices VulkanInstance::getQueueFamilies(VkPhysicalDevice device){
+    QueueFamilyIndices VulkanInstance::_getQueueFamilies(VkPhysicalDevice device){
         QueueFamilyIndices indices;
         uint32_t queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
@@ -57,7 +57,7 @@ namespace Waffles{
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
-                indices.graphicsFamily = i;
+                indices.graphicsFamilyIndex = i;
                 indices.gf_set = true;
             }
             if(indices.isComplete()) break;
@@ -66,38 +66,67 @@ namespace Waffles{
         return indices;
     }
 
-        void VulkanInstance::_validatationLayersAssert(){
-            uint32_t layerCount;
-            vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+    void VulkanInstance::_createLogicalDevice(){
+        QueueFamilyIndices indices = _getQueueFamilies(_physicalDevice);
 
-            std::vector<VkLayerProperties> availableLayers(layerCount);
-            vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-            bool validationLayersSupported = false;
-            const std::vector<const char*> _validationLayers = {"VK_LAYER_KHRONOS_validation"};
-            for (const char* layerName : _validationLayers) {
-                bool layerFound = false;
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = indices.graphicsFamilyIndex;
+        queueCreateInfo.queueCount = 1;
+        float queuePriority = 1.0f;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
 
-                for (const auto& layerProperties : availableLayers) {
-                    if (strcmp(layerName, layerProperties.layerName) == 0) {
-                        layerFound = true;
-                        break;
-                    }
-                }
+        VkPhysicalDeviceFeatures deviceFeatures{};
+        VkDeviceCreateInfo createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
-                if (!layerFound) {
-                    validationLayersSupported = false;
+        createInfo.pQueueCreateInfos = &queueCreateInfo;
+        createInfo.queueCreateInfoCount = 1;
+
+        createInfo.pEnabledFeatures = &deviceFeatures;
+
+        createInfo.enabledExtensionCount = 0;
+
+        if(_activateLayers){
+            createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
+            createInfo.ppEnabledLayerNames = _validationLayers.data();
+        }else createInfo.enabledLayerCount = 0;
+
+
+    }
+
+    void VulkanInstance::_validatationLayersAssert(){
+        uint32_t layerCount;
+        vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+        std::vector<VkLayerProperties> availableLayers(layerCount);
+        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+        bool validationLayersSupported = false;
+        for (const char* layerName : _validationLayers) {
+            bool layerFound = false;
+
+            for (const auto& layerProperties : availableLayers) {
+                if (strcmp(layerName, layerProperties.layerName) == 0) {
+                    layerFound = true;
+                    break;
                 }
             }
 
-            validationLayersSupported = true;
+            if (!layerFound) {
+                validationLayersSupported = false;
+            }
+        }
 
-            #ifdef DEBUG_MODE
-                if(!validationLayersSupported){
-                    ERROR("Debug mode activated but couldn't initialize validation layers");
-                }
-            #else
-                DEBUG("Validation layers initialized");
-            #endif
+        validationLayersSupported = true;
+
+        #ifdef DEBUG_MODE
+            _activateLayers = true;
+            if(!validationLayersSupported){
+                ERROR("Debug mode activated but couldn't initialize validation layers");
+            }
+        #else
+            DEBUG("Validation layers initialized");
+        #endif
 
 
     }

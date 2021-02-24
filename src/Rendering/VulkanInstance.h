@@ -10,7 +10,7 @@ namespace Waffles{
 
     struct QueueFamilyIndices {
         //std::optional<uint32_t> graphicsFamily;
-        uint32_t graphicsFamily;
+        uint32_t graphicsFamilyIndex;
         bool gf_set = false;
         
         bool isComplete() {
@@ -24,10 +24,16 @@ namespace Waffles{
             VkInstance _vulkanInstance;
             VkPhysicalDevice _physicalDevice;
             VkDevice _logicalDevice;
+            bool _activateLayers = false;
             void _validatationLayersAssert();
             void _setPhysicalDevice();
             bool _isRTXEnabledGPU(VkPhysicalDevice);
-            QueueFamilyIndices getQueueFamilies(VkPhysicalDevice);
+            void _createLogicalDevice();
+            QueueFamilyIndices _getQueueFamilies(VkPhysicalDevice);
+
+            const std::vector<const char*> _validationLayers = {
+                "VK_LAYER_KHRONOS_validation"
+            };
 
         public:
 
