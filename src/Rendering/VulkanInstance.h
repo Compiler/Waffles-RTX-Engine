@@ -5,6 +5,7 @@
 #include <Startup/Startup.h>
 #include <Tools/Logging.h>
 #include <cstring>
+#include <string>
 //#include <optional>
 namespace Waffles{
 

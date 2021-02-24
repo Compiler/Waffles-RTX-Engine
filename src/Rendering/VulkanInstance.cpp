@@ -16,8 +16,10 @@ namespace Waffles{
         VkPhysicalDeviceFeatures deviceFeatures;
         vkGetPhysicalDeviceProperties(dev, &deviceProperties);
         vkGetPhysicalDeviceFeatures(dev, &deviceFeatures);
+        LOG("Testing: %s", deviceProperties.deviceName );
+
         QueueFamilyIndices indices = _getQueueFamilies(dev);
-        return indices.isComplete();
+        return indices.isComplete() && deviceFeatures.geometryShader && deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
     }
 
 
@@ -37,7 +39,7 @@ namespace Waffles{
             if (_isRTXEnabledGPU(device)) {
                 _physicalDevice = device;
                 LOG("RTX Enabled device set");
-                break;
+                //break;
             }
         }
 
