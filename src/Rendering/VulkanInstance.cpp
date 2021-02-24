@@ -5,7 +5,6 @@ namespace Waffles{
     void VulkanInstance::load(){
         _vulkanInstance = Startup::createVKInstance("Waffles-RTX-PBR", "Waffles");
         LOG("Vulkan Instance retreived");
-        _validationLayers.push_back(std::string("VK_LAYER_KHRONOS_validation").c_str());
         DEBUG_FUNC(_validatationLayersAssert());
         DEBUG_FUNC(_setPhysicalDevice());
         DEBUG_FUNC(_createLogicalDevice());
