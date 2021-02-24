@@ -8,7 +8,7 @@
 #include <optional>
 namespace Waffles{
     struct QueueFamilyIndices {
-        std::experimental::optional<uint32_t> graphicsFamily;
+        std::optional<uint32_t> graphicsFamily;
         
         bool isComplete() {
             return graphicsFamily.has_value();
