@@ -5,13 +5,16 @@
 #include <Startup/Startup.h>
 #include <Tools/Logging.h>
 #include <cstring>
-#include <optional>
+//#include <optional>
 namespace Waffles{
+
     struct QueueFamilyIndices {
-        std::optional<uint32_t> graphicsFamily;
+        //std::optional<uint32_t> graphicsFamily;
+        uint32_t graphicsFamily;
+        bool gf_set = false;
         
         bool isComplete() {
-            return graphicsFamily.has_value();
+            return gf_set;
         }
     };
 
@@ -20,10 +23,11 @@ namespace Waffles{
         private:
             VkInstance _vulkanInstance;
             VkPhysicalDevice _physicalDevice;
+            VkDevice _logicalDevice;
             void _validatationLayersAssert();
             void _setPhysicalDevice();
             bool _isRTXEnabledGPU(VkPhysicalDevice);
-            uint32_t getQueueFamilies(VkPhysicalDevice);
+            QueueFamilyIndices getQueueFamilies(VkPhysicalDevice);
 
         public:
 

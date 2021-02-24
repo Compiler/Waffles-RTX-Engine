@@ -16,7 +16,7 @@ namespace Waffles{
         VkPhysicalDeviceFeatures deviceFeatures;
         vkGetPhysicalDeviceProperties(dev, &deviceProperties);
         vkGetPhysicalDeviceFeatures(dev, &deviceFeatures);
-        QueueFamilyIndices indices = findQueueFamilies(device);
+        QueueFamilyIndices indices = getQueueFamilies(dev);
         return indices.isComplete();
     }
 
@@ -47,7 +47,7 @@ namespace Waffles{
         
     }
 
-    uint32_t VulkanInstance::getQueueFamilies(VkPhysicalDevice device){
+    QueueFamilyIndices VulkanInstance::getQueueFamilies(VkPhysicalDevice device){
         QueueFamilyIndices indices;
         uint32_t queueFamilyCount = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
@@ -56,8 +56,11 @@ namespace Waffles{
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
-            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) indices.graphicsFamily = i;
-            if(QueueFamilyIndices.isComplete()) break;
+            if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
+                indices.graphicsFamily = i;
+                indices.gf_set = true;
+            }
+            if(indices.isComplete()) break;
             i++;
         }
         return indices;
