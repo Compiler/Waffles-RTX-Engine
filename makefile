@@ -1,6 +1,6 @@
-
-CXX = g++
-C++_VERSION = c++17
+BIT = 32
+CXX = g++$(BIT)
+C++_VERSION = c++11
 CXXFLAGS = -std=$(C++_VERSION) -Wall -w -g -static-libgcc -static-libstdc++
 
 OUT_DIR = bin

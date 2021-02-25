@@ -6,9 +6,9 @@ namespace Waffles{
         _vulkanInstance = Startup::createVKInstance("Waffles-RTX-PBR", "Waffles");
         LOG("Vulkan Instance retreived");
         DEBUG_FUNC(_validatationLayersAssert());
+        DEBUG_FUNC(_createSurface(window));
         DEBUG_FUNC(_setPhysicalDevice());
         DEBUG_FUNC(_createLogicalDevice());
-        DEBUG_FUNC(_createSurface(window));
     }
 
 
@@ -64,6 +64,7 @@ namespace Waffles{
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
             vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);
+            LOG("HEre");
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
                 indices.graphicsFamily.index = i;
                 indices.graphicsFamily.set = true;
@@ -74,6 +75,7 @@ namespace Waffles{
             }
             if(indices.isComplete()) break;
             i++;
+
         }
         return indices;
     }
@@ -161,8 +163,8 @@ namespace Waffles{
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
         vkDestroySurfaceKHR(_vulkanInstance, _surface, nullptr);
-        vkDestroyInstance(_vulkanInstance, nullptr);
         vkDestroyDevice(_logicalDevice, nullptr);
+        vkDestroyInstance(_vulkanInstance, nullptr);
 
     }
 }

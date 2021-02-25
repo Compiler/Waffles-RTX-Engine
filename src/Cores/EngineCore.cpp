@@ -17,6 +17,7 @@ namespace Waffles{
 
 
     void EngineCore::update(){
+        if(InputManager::isKeyPressed(KeyCodes::KEY_ESCAPE)) glfwSetWindowShouldClose(_window->getWindow(), true);
         
         InputManager::clear();
         glfwPollEvents();
