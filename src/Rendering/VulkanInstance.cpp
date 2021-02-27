@@ -4,15 +4,17 @@ namespace Waffles{
 
     void VulkanInstance::load(GLFWwindow* window){
         DEBUG_FUNC(_createInstance("Waffles-RTX-Engine", "Waffles"));
-        DEBUG_FUNC(_validatationLayersAssert());
         DEBUG_FUNC(_createDebugMessenger());
-        DEBUG_FUNC(_createSurface(window));
-        DEBUG_FUNC(_setPhysicalDevice());
-        DEBUG_FUNC(_createLogicalDevice());
+        //DEBUG_FUNC(_createSurface(window));
+        //DEBUG_FUNC(_setPhysicalDevice());
+        //DEBUG_FUNC(_createLogicalDevice());
     }
 
 
     void VulkanInstance::_createInstance(const char* appName, const char* engineName){
+        if(enableValidationLayers && !_validatationLayersAssert()){
+            ERROR("Validation layers requested but are not availble -- Debug mode is off or validation layer couldn't be found");
+        }
 
         VkApplicationInfo appInfo{};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -31,21 +33,19 @@ namespace Waffles{
         createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         createInfo.ppEnabledExtensionNames = extensions.data();
 
+
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
         if (enableValidationLayers) {
+            LOG("Enabled validation layers: size: %d", static_cast<uint32_t>(_validationLayers.size()));
             createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
             createInfo.ppEnabledLayerNames = _validationLayers.data();
-
-            populateDebugMessengerCreateInfo(debugCreateInfo);
-            createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
         } else {
             createInfo.enabledLayerCount = 0;
-            
             createInfo.pNext = nullptr;
         }
-
-        if (vkCreateInstance(&createInfo, nullptr, &_vulkanInstance) != VK_SUCCESS) {
-            ERROR("Failed to create vulkan instance");
+        VkResult result = vkCreateInstance(&createInfo, nullptr, &_vulkanInstance);
+        if (result != VK_SUCCESS) {
+            ERROR("Failed to create vulkan instance : %d - %d, %d, %d", result, VK_ERROR_LAYER_NOT_PRESENT, VK_SUCCESS, VK_INCOMPLETE);
         }else{
             DEBUG("Vulkan Instance Created!");
         }
@@ -63,6 +63,8 @@ namespace Waffles{
 
         if (CreateDebugUtilsMessengerEXT(_vulkanInstance, &createInfo, nullptr, &_debugMessenger) != VK_SUCCESS) {
             ERROR("failed to set up debug messenger!");
+        }else{
+            LOG("Debug Messenger successfully created.");
         }
     }
 
@@ -154,7 +156,7 @@ namespace Waffles{
 
         createInfo.enabledExtensionCount = 0;
 
-        if(_activateLayers){
+        if(enableValidationLayers){
             createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
             createInfo.ppEnabledLayerNames = _validationLayers.data();
         }else createInfo.enabledLayerCount = 0;
@@ -175,19 +177,18 @@ namespace Waffles{
     }
 
 
-    void VulkanInstance::_validatationLayersAssert(){
+    bool VulkanInstance::_validatationLayersAssert(){
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
         std::vector<VkLayerProperties> availableLayers(layerCount);
         vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-        bool _validationLayersSupported = false;
-        LOG("Validation layers size: %d", _validationLayers.size());
-        LOG("Validation layers size: %s", _validationLayers.at(0));
+        LOG("Validation layers size: %d", layerCount);
         for (const char* layerName : _validationLayers) {
             bool layerFound = false;
 
             for (const auto& layerProperties : availableLayers) {
+                LOG("Checking if %s == %s", layerName, layerProperties.layerName);
                 if (strcmp(layerName, layerProperties.layerName) == 0) {
                     layerFound = true;
                     break;
@@ -195,22 +196,10 @@ namespace Waffles{
             }
 
             if (!layerFound) {
-                _validationLayersSupported = false;
+                return false;
             }
         }
-
-        _validationLayersSupported = true;
-
-        #ifdef DEBUG_MODE
-            _activateLayers = true;
-            if(!_validationLayersSupported){
-                ERROR("Debug mode activated but couldn't initialize validation layers");
-            }
-        #else
-            DEBUG("Validation layers initialized");
-        #endif
-
-
+        return true;
     }
 
     void VulkanInstance::unload(){

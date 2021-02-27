@@ -2,7 +2,7 @@
 namespace Waffles{
 
     void RenderCore::load(){
-        DEBUG("RenderCore Loading...");
+        INIT_LOG("RenderCore Loading...");
         _engineCore.load();
     }
 

@@ -15,7 +15,7 @@ const bool enableValidationLayers = false;
 
 
 
-#define DEBUG_FUNC(x) LOG("Starting %s", #x); x; LOG("Ending %s", #x)
+#define DEBUG_FUNC(x) INIT_LOG("Starting %s", #x); x; LOG("Ending %s", #x)
 namespace Waffles{
     struct OptionalPair{
         uint32_t index;
@@ -40,10 +40,9 @@ namespace Waffles{
             VkSurfaceKHR _surface;
             VkDebugUtilsMessengerEXT _debugMessenger;
 
-            bool _activateLayers = false;
             void _createInstance(const char* appName, const char* engineName);
             void _createDebugMessenger();
-            void _validatationLayersAssert();
+            bool _validatationLayersAssert();
             void _setPhysicalDevice();
             bool _isRTXEnabledGPU(VkPhysicalDevice);
             void _createLogicalDevice();
@@ -80,7 +79,7 @@ namespace Waffles{
 
 
             static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
-                LOG("validation layer: %s", pCallbackData->pMessage);
+                WARN("validation layer: %s", pCallbackData->pMessage);
                 return VK_FALSE;
             }
 
