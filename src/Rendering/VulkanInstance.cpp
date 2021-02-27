@@ -3,15 +3,68 @@
 namespace Waffles{
 
     void VulkanInstance::load(GLFWwindow* window){
-        _vulkanInstance = Startup::createVKInstance("Waffles-RTX-PBR", "Waffles");
-        LOG("Vulkan Instance retreived");
+        DEBUG_FUNC(_createInstance("Waffles-RTX-Engine", "Waffles"));
         DEBUG_FUNC(_validatationLayersAssert());
+        DEBUG_FUNC(_createDebugMessenger());
         DEBUG_FUNC(_createSurface(window));
         DEBUG_FUNC(_setPhysicalDevice());
         DEBUG_FUNC(_createLogicalDevice());
     }
 
 
+    void VulkanInstance::_createInstance(const char* appName, const char* engineName){
+
+        VkApplicationInfo appInfo{};
+        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        appInfo.pApplicationName = appName;
+        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+        appInfo.pEngineName = engineName;
+        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+        appInfo.apiVersion = VK_API_VERSION_1_0;
+
+
+        VkInstanceCreateInfo createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+        createInfo.pApplicationInfo = &appInfo;
+
+        auto extensions = getRequiredExtensions();
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+        createInfo.ppEnabledExtensionNames = extensions.data();
+
+        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
+        if (enableValidationLayers) {
+            createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
+            createInfo.ppEnabledLayerNames = _validationLayers.data();
+
+            populateDebugMessengerCreateInfo(debugCreateInfo);
+            createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
+        } else {
+            createInfo.enabledLayerCount = 0;
+            
+            createInfo.pNext = nullptr;
+        }
+
+        if (vkCreateInstance(&createInfo, nullptr, &_vulkanInstance) != VK_SUCCESS) {
+            ERROR("Failed to create vulkan instance");
+        }else{
+            DEBUG("Vulkan Instance Created!");
+        }
+    }
+
+
+    void VulkanInstance::_createDebugMessenger() {
+        if (!enableValidationLayers){
+            WARN("NO validation layers enabled");
+            return;
+        }
+
+        VkDebugUtilsMessengerCreateInfoEXT createInfo;
+        populateDebugMessengerCreateInfo(createInfo);
+
+        if (CreateDebugUtilsMessengerEXT(_vulkanInstance, &createInfo, nullptr, &_debugMessenger) != VK_SUCCESS) {
+            ERROR("failed to set up debug messenger!");
+        }
+    }
 
     bool VulkanInstance::_isRTXEnabledGPU(VkPhysicalDevice dev){
         VkPhysicalDeviceProperties deviceProperties;
@@ -128,7 +181,7 @@ namespace Waffles{
 
         std::vector<VkLayerProperties> availableLayers(layerCount);
         vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-        bool validationLayersSupported = false;
+        bool _validationLayersSupported = false;
         LOG("Validation layers size: %d", _validationLayers.size());
         LOG("Validation layers size: %s", _validationLayers.at(0));
         for (const char* layerName : _validationLayers) {
@@ -142,15 +195,15 @@ namespace Waffles{
             }
 
             if (!layerFound) {
-                validationLayersSupported = false;
+                _validationLayersSupported = false;
             }
         }
 
-        validationLayersSupported = true;
+        _validationLayersSupported = true;
 
         #ifdef DEBUG_MODE
             _activateLayers = true;
-            if(!validationLayersSupported){
+            if(!_validationLayersSupported){
                 ERROR("Debug mode activated but couldn't initialize validation layers");
             }
         #else
