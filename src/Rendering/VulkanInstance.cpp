@@ -3,6 +3,9 @@
 namespace Waffles{
 
     void VulkanInstance::load(GLFWwindow* window){
+        uint32_t extensionCount = 0;
+        vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+        LOG("%d", extensionCount);
         DEBUG_FUNC(_createInstance("Waffles-RTX-Engine", "Waffles"));
         DEBUG_FUNC(_createDebugMessenger());
         DEBUG_FUNC(_createSurface(window));
@@ -12,7 +15,6 @@ namespace Waffles{
 
 
     void VulkanInstance::_createInstance(const char* appName, const char* engineName){
-        LOG("SUP");
         if(enableValidationLayers && !_validatationLayersAssert()){
             ERROR("Validation layers requested but are not availble -- Debug mode is off or validation layer couldn't be found");
         }

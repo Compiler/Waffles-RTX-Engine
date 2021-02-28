@@ -1,6 +1,6 @@
-BIT = 64
 PATH_TO_MINGW64 = C:/MinGW64/mingw64/bin
-CXX = $(PATH_TO_MINGW64)/g++
+PATH_TO_MINGW32 = C:/MinGW/bin
+CXX = $(PATH_TO_MINGW32)/g++32
 C++_VERSION = c++11
 CXXFLAGS = -std=$(C++_VERSION) -Wall -w -g -static-libgcc -static-libstdc++
 
@@ -12,21 +12,21 @@ ENTRY_POINT = src/main.cpp
 #Libs
 VULKAN_ROOT = C:/VulkanSDK/1.2.162.0/
 VULKAN_INC = $(VULKAN_ROOT)Include/
-VULKAN_LIB = $(VULKAN_ROOT)Lib/
+VULKAN_LIB = $(VULKAN_ROOT)Lib32/
 
 
-GLFW_ROOT = extern/glfw-3.3.3.64/
+GLFW_ROOT = extern/glfw-3.3.3.32/
 GLFW_INC = $(GLFW_ROOT)include
 GLFW_LIB = $(GLFW_ROOT)lib
-GLFW_SRC = $(GLFW_ROOT)../src
+GLFW_SRC = $(GLFW_ROOT)src
 
 GLM_ROOT = extern/glm/
 
 STBIMAGE_ROOT = extern/stbimage
 
-INC= -I$(SRC_DIR) -I$(GLFW_INC) -I$(STBIMAGE_ROOT) -I$(GLM_ROOT) -I$(VULKAN_INC) 
-LIBS = -L$(GLFW_LIB) -L$(VULKAN_LIB) -L$(VULKAN_ROOT)Bin/
-LINKS = -lglfw3 -lvulkan-1
+INC= -I $(SRC_DIR) -I $(GLFW_INC) -I $(STBIMAGE_ROOT) -I $(GLM_ROOT) -I $(VULKAN_INC) 
+LIBS = -L $(GLFW_LIB) -L $(VULKAN_LIB)
+LINKS = -lglfw3 -lvulkan-1 -lgdi32#-lVkLayer_utils
 
 #========================OBJECTS========================#
 STARTUP_OBJS = $(OUT_DIR)/Startup.o
@@ -43,9 +43,10 @@ ALL_SETTINGS = $(CXX) $(CXXFLAGS) $(LIBS) $(INC)
 main: $(ENTRY_POINT) $(OBJS)
 	$(ALL_SETTINGS) -DDEBUG_MODE -o $(OUT_DIR)/$(LAUNCHER_NAME) $^ $(LINKS)
 	./$(OUT_DIR)/$(LAUNCHER_NAME).exe
+
+run:
+	./$(OUT_DIR)/$(LAUNCHER_NAME).exe
 	
-
-
 release: $(ENTRY_POINT) $(OBJS)
 	$(ALL_SETTINGS) -O3 -DRELEASE_MODE -o $(OUT_DIR)/$(LAUNCHER_NAME) $^ $(LINKS)
 	./$(OUT_DIR)/$(LAUNCHER_NAME).exe
