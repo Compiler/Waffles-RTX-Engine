@@ -26,8 +26,8 @@ GLM_ROOT = extern/glm/
 
 STBIMAGE_ROOT = extern/stbimage
 
-INC= -I $(SRC_DIR) -I $(GLFW_INC) -I $(STBIMAGE_ROOT) -I $(GLM_ROOT) -I$(VULKAN_INC)
-LIBS = -L $(GLFW_LIB) -L$(VULKAN_LIB)
+INC= -I $(SRC_DIR) -I $(GLFW_INC) -I $(STBIMAGE_ROOT) -I $(GLM_ROOT) -I$(VULKAN_INC) 
+LIBS = -L $(GLFW_LIB) -L$(VULKAN_LIB) -L$(VULKAN_ROOT)Bin/
 LINKS = -lglfw3 -lgdi32 -lvulkan-1 
 
 #========================OBJECTS========================#

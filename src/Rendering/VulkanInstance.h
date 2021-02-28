@@ -16,7 +16,7 @@ const bool enableValidationLayers = false;
 
 
 
-#define DEBUG_FUNC(x) INIT_LOG("Starting %s", #x); x; LOG("Ending %s", #x)
+#define DEBUG_FUNC(x) INIT_LOG("----\tStarting %s", #x); x; LOG("----\tEnding %s", #x)
 namespace Waffles{
     struct OptionalPair{
         uint32_t index;
@@ -24,10 +24,10 @@ namespace Waffles{
     };
     struct QueueFamilyIndices {
         OptionalPair graphicsFamily;
-        OptionalPair presentFamily;
+        OptionalPair presentationFamily;
         
         bool isComplete() {
-            return graphicsFamily.set && presentFamily.set;
+            return graphicsFamily.set && presentationFamily.set;
         }
     };
 
@@ -37,7 +37,7 @@ namespace Waffles{
             VkInstance _vulkanInstance;
             VkPhysicalDevice _physicalDevice;
             VkDevice _logicalDevice;
-            VkQueue _graphicsQueue;
+            VkQueue _graphicsQueue, _presentationQueue;
             VkSurfaceKHR _surface;
             VkDebugUtilsMessengerEXT _debugMessenger;
 
@@ -48,7 +48,7 @@ namespace Waffles{
             bool _isRTXEnabledGPU(VkPhysicalDevice);
             void _createLogicalDevice();
             void _createSurface(GLFWwindow* window);
-            bool _checkDeviceExtensionSupport(VkPhysicalDevice device);
+            bool _deviceSupportsExtensions(VkPhysicalDevice device);
 
             QueueFamilyIndices _getQueueFamilies(VkPhysicalDevice);
 
@@ -57,8 +57,13 @@ namespace Waffles{
             };
 
             const std::vector<const char*> _deviceExtensions = {
-                VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, VK_KHR_MAINTENANCE3_EXTENSION_NAME,
-                VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME, VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME
+                VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                //VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME, 
+                //VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, 
+                //VK_KHR_MAINTENANCE3_EXTENSION_NAME,
+                //VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME, 
+                //VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME, 
+                //VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME
             };
 
         public:

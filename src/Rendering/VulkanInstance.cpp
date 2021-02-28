@@ -54,7 +54,7 @@ namespace Waffles{
         }
     }
 
-    bool VulkanInstance::_checkDeviceExtensionSupport(VkPhysicalDevice device){
+    bool VulkanInstance::_deviceSupportsExtensions(VkPhysicalDevice device){
         uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 
@@ -66,7 +66,7 @@ namespace Waffles{
         for (const auto& extension : availableExtensions) {
             requiredExtensions.erase(extension.extensionName);
         }
-
+        LOG("Extensions left: %d", requiredExtensions.size());
         return requiredExtensions.empty();
     }
 
@@ -94,12 +94,14 @@ namespace Waffles{
         vkGetPhysicalDeviceFeatures(dev, &deviceFeatures);
         LOG("Testing: %s", deviceProperties.deviceName );
 
-        bool extensionsSupported = _checkDeviceExtensionSupport(dev);
+        QueueFamilyIndices indices = _getQueueFamilies(dev);
+
+        bool extensionsSupported = _deviceSupportsExtensions(dev);
         if(extensionsSupported){
             LOG("Device supports RTX");
         }
-        QueueFamilyIndices indices = _getQueueFamilies(dev);
-        return indices.isComplete() && deviceFeatures.geometryShader && deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && extensionsSupported;
+
+        return indices.isComplete() && extensionsSupported;
     }
 
 
@@ -137,18 +139,18 @@ namespace Waffles{
         std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
         vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
         
-        VkBool32 presentSupport = false;
         
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
-            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
                 indices.graphicsFamily.index = i;
                 indices.graphicsFamily.set = true;
             }
+            VkBool32 presentSupport = true;
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);
             if (presentSupport) {
-                indices.presentFamily.index = i;
-                indices.presentFamily.set = true;
+                indices.presentationFamily.index = i;
+                indices.presentationFamily.set = true;
             }
             if(indices.isComplete()) break;
             i++;
@@ -159,25 +161,31 @@ namespace Waffles{
 
     void VulkanInstance::_createLogicalDevice(){
         QueueFamilyIndices indices = _getQueueFamilies(_physicalDevice);
+        
+        std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+        std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.index, indices.presentationFamily.index};
 
-        VkDeviceQueueCreateInfo queueCreateInfo{};
-        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.index;
-        queueCreateInfo.queueCount = 1;
         float queuePriority = 1.0f;
-        queueCreateInfo.pQueuePriorities = &queuePriority;
+        for (uint32_t queueFamily : uniqueQueueFamilies) {
+            VkDeviceQueueCreateInfo queueCreateInfo{};
+            queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+            queueCreateInfo.queueFamilyIndex = queueFamily;
+            queueCreateInfo.queueCount = 1;
+            queueCreateInfo.pQueuePriorities = &queuePriority;
+            queueCreateInfos.push_back(queueCreateInfo);
+        }
 
         VkPhysicalDeviceFeatures deviceFeatures{};
         VkDeviceCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
-        createInfo.pQueueCreateInfos = &queueCreateInfo;
-        createInfo.queueCreateInfoCount = 1;
+        createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+        createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
         createInfo.pEnabledFeatures = &deviceFeatures;
 
-        createInfo.enabledExtensionCount = 0;
-
+        createInfo.ppEnabledExtensionNames = _deviceExtensions.data();   
+        createInfo.enabledExtensionCount = static_cast<uint32_t>(_deviceExtensions.size());
         if(enableValidationLayers){
             createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
             createInfo.ppEnabledLayerNames = _validationLayers.data();
@@ -188,6 +196,7 @@ namespace Waffles{
         }else {LOG("Created logical device.");}
 
         vkGetDeviceQueue(_logicalDevice, indices.graphicsFamily.index, 0, &_graphicsQueue); //retrieve queue handle
+        vkGetDeviceQueue(_logicalDevice, indices.presentationFamily.index, 0, &_presentationQueue); //retrieve present handle
 
 
     }
