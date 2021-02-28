@@ -5,9 +5,9 @@ namespace Waffles{
     void VulkanInstance::load(GLFWwindow* window){
         DEBUG_FUNC(_createInstance("Waffles-RTX-Engine", "Waffles"));
         DEBUG_FUNC(_createDebugMessenger());
-        //DEBUG_FUNC(_createSurface(window));
-        //DEBUG_FUNC(_setPhysicalDevice());
-        //DEBUG_FUNC(_createLogicalDevice());
+        DEBUG_FUNC(_createSurface(window));
+        DEBUG_FUNC(_setPhysicalDevice());
+        DEBUG_FUNC(_createLogicalDevice());
     }
 
 
@@ -54,6 +54,22 @@ namespace Waffles{
         }
     }
 
+    bool VulkanInstance::_checkDeviceExtensionSupport(VkPhysicalDevice device){
+        uint32_t extensionCount;
+        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+
+        std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+        vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
+
+        std::set<std::string> requiredExtensions(_deviceExtensions.begin(), _deviceExtensions.end());
+
+        for (const auto& extension : availableExtensions) {
+            requiredExtensions.erase(extension.extensionName);
+        }
+
+        return requiredExtensions.empty();
+    }
+
 
     void VulkanInstance::_createDebugMessenger() {
         if (!enableValidationLayers){
@@ -78,8 +94,12 @@ namespace Waffles{
         vkGetPhysicalDeviceFeatures(dev, &deviceFeatures);
         LOG("Testing: %s", deviceProperties.deviceName );
 
+        bool extensionsSupported = _checkDeviceExtensionSupport(dev);
+        if(extensionsSupported){
+            LOG("Device supports RTX");
+        }
         QueueFamilyIndices indices = _getQueueFamilies(dev);
-        return indices.isComplete() && deviceFeatures.geometryShader && deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+        return indices.isComplete() && deviceFeatures.geometryShader && deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && extensionsSupported;
     }
 
 
@@ -122,7 +142,6 @@ namespace Waffles{
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
             vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);
-            LOG("HEre");
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
                 indices.graphicsFamily.index = i;
                 indices.graphicsFamily.set = true;

@@ -6,6 +6,7 @@
 #include <Tools/Logging.h>
 #include <cstring>
 #include <string>
+#include <set>
 
 #ifdef DEBUG_MODE
 const bool enableValidationLayers = true;
@@ -47,11 +48,17 @@ namespace Waffles{
             bool _isRTXEnabledGPU(VkPhysicalDevice);
             void _createLogicalDevice();
             void _createSurface(GLFWwindow* window);
+            bool _checkDeviceExtensionSupport(VkPhysicalDevice device);
 
             QueueFamilyIndices _getQueueFamilies(VkPhysicalDevice);
 
             const std::vector<const char*> _validationLayers = {
                 "VK_LAYER_KHRONOS_validation"
+            };
+
+            const std::vector<const char*> _deviceExtensions = {
+                VK_KHR_SWAPCHAIN_EXTENSION_NAME, VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME, VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, VK_KHR_MAINTENANCE3_EXTENSION_NAME,
+                VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME, VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME, VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME
             };
 
         public:
@@ -71,6 +78,7 @@ namespace Waffles{
                 std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
                 if (enableValidationLayers) {
+                    LOG("Added debug tools ");
                     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
                 }
 
