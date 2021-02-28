@@ -1,8 +1,8 @@
-PATH_TO_MINGW64 = C:/MinGW64/mingw64/bin
+PATH_TO_MINGW64 = C:/MinGW-64/bin
 PATH_TO_MINGW32 = C:/MinGW/bin
 CXX = $(PATH_TO_MINGW64)/g++
 C++_VERSION = c++11
-CXXFLAGS = -std=$(C++_VERSION) -m64 -Wall -w -g 
+CXXFLAGS = -std=$(C++_VERSION) -m64 -Wall -w -g -static-libgcc -static-libstdc++
 
 OUT_DIR = bin
 LAUNCHER_NAME = WafflesRTX
@@ -26,7 +26,7 @@ STBIMAGE_ROOT = extern/stbimage
 
 INC= -I $(SRC_DIR) -I $(GLFW_INC) -I $(STBIMAGE_ROOT) -I $(GLM_ROOT) -I $(VULKAN_INC) 
 LIBS = -L $(GLFW_LIB) -L $(VULKAN_LIB) 
-LINKS = -lglfw3dll -lvulkan-1 -lpthread#-lVkLayer_utils
+LINKS = -lglfw3dll -lvulkan-1 -lpthread #-lVkLayer_utils
 
 #========================OBJECTS========================#
 STARTUP_OBJS = $(OUT_DIR)/Startup.o

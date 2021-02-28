@@ -2,7 +2,8 @@
 #include <Tools/Logging.h>
 #include <Cores/RenderCore.h>
 int main(){
-    
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
     WARN("Program begin");
     Waffles::RenderCore core;
     if(__DEBUG_MODE){
