@@ -39,6 +39,9 @@ namespace Waffles{
             LOG("Enabled validation layers: size: %d", static_cast<uint32_t>(_validationLayers.size()));
             createInfo.enabledLayerCount = static_cast<uint32_t>(_validationLayers.size());
             createInfo.ppEnabledLayerNames = _validationLayers.data();
+
+            populateDebugMessengerCreateInfo(debugCreateInfo);
+            createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
         } else {
             createInfo.enabledLayerCount = 0;
             createInfo.pNext = nullptr;

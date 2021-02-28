@@ -79,7 +79,12 @@ namespace Waffles{
 
 
             static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
-                WARN("validation layer: %s", pCallbackData->pMessage);
+                if(messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+                    WARN("validation layer: %s", pCallbackData->pMessage);
+                }
+                if(messageSeverity > VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+                    NON_FATAL_ERROR("validation layer: %s", pCallbackData->pMessage);
+                }
                 return VK_FALSE;
             }
 
