@@ -12,6 +12,7 @@ namespace Waffles{
 
 
     void VulkanInstance::_createInstance(const char* appName, const char* engineName){
+        LOG("SUP");
         if(enableValidationLayers && !_validatationLayersAssert()){
             ERROR("Validation layers requested but are not availble -- Debug mode is off or validation layer couldn't be found");
         }
@@ -66,7 +67,6 @@ namespace Waffles{
         for (const auto& extension : availableExtensions) {
             requiredExtensions.erase(extension.extensionName);
         }
-        LOG("Extensions left: %d", requiredExtensions.size());
         return requiredExtensions.empty();
     }
 

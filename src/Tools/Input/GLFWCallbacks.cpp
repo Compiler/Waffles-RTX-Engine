@@ -1,7 +1,9 @@
 #include "GLFWCallbacks.h"
 
 
+
 void GLFWCallbacks::initCallBacks(Waffles::Window* _windowRef){
+	INIT_LOG("GLFWCallbacks Loading...");
 	glfwSetKeyCallback(_windowRef->getWindow(), GLFWCallbacks::keyCallback);
 	glfwSetCursorPosCallback(_windowRef->getWindow(), GLFWCallbacks::cursorPositionCallback);
 	glfwSetMouseButtonCallback(_windowRef->getWindow(), GLFWCallbacks::mouseClickCallback);
