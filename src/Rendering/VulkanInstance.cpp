@@ -237,6 +237,7 @@ namespace Waffles{
 
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
+        if(enableValidationLayers) DestroyDebugUtilsMessengerEXT(_vulkanInstance, _debugMessenger, nullptr);
         vkDestroySurfaceKHR(_vulkanInstance, _surface, nullptr);
         vkDestroyDevice(_logicalDevice, nullptr);
         vkDestroyInstance(_vulkanInstance, nullptr);
