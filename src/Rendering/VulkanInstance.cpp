@@ -57,6 +57,8 @@ namespace Waffles{
         }
     }
 
+
+    //where we check if the extensions are supported for a device
     bool VulkanInstance::_deviceSupportsExtensions(VkPhysicalDevice device){
         uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -67,10 +69,18 @@ namespace Waffles{
         std::set<std::string> requiredExtensions(_deviceExtensions.begin(), _deviceExtensions.end());
 
         for (const auto& extension : availableExtensions) {
+            LOG("Extension: '%s'", extension.extensionName);
             requiredExtensions.erase(extension.extensionName);
         }
         return requiredExtensions.empty();
     }
+
+    SwapChainSupportDetails VulkanInstance::_querySwapChainSupport(VkPhysicalDevice device){
+        SwapChainSupportDetails details;
+        return details;
+
+    }
+
 
 
     void VulkanInstance::_createDebugMessenger() {

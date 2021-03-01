@@ -31,6 +31,12 @@ namespace Waffles{
         }
     };
 
+    struct SwapChainSupportDetails {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
+    };
+
     class VulkanInstance{
 
         private:
@@ -49,6 +55,7 @@ namespace Waffles{
             void _createLogicalDevice();
             void _createSurface(GLFWwindow* window);
             bool _deviceSupportsExtensions(VkPhysicalDevice device);
+            SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device);
 
             QueueFamilyIndices _getQueueFamilies(VkPhysicalDevice);
 
@@ -58,6 +65,8 @@ namespace Waffles{
 
             const std::vector<const char*> _deviceExtensions = {
                 VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                VK_NV_RAY_TRACING_EXTENSION_NAME,
+                VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME
                 //VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME, 
                 //VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, 
                 //VK_KHR_MAINTENANCE3_EXTENSION_NAME,

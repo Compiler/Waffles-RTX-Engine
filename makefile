@@ -1,5 +1,4 @@
 PATH_TO_MINGW64 = C:/MinGW-64/bin
-PATH_TO_MINGW32 = C:/MinGW/bin
 CXX = $(PATH_TO_MINGW64)/g++
 C++_VERSION = c++11
 CXXFLAGS = -std=$(C++_VERSION) -m64 -Wall -w -g -static-libgcc -static-libstdc++
