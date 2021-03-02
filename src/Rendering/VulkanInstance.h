@@ -55,7 +55,9 @@ namespace Waffles{
             void _createLogicalDevice();
             void _createSurface(GLFWwindow* window);
             bool _deviceSupportsExtensions(VkPhysicalDevice device);
+            
             SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device);
+            VkSurfaceFormatKHR _chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 
             QueueFamilyIndices _getQueueFamilies(VkPhysicalDevice);
 
@@ -66,13 +68,16 @@ namespace Waffles{
             const std::vector<const char*> _deviceExtensions = {
                 VK_KHR_SWAPCHAIN_EXTENSION_NAME,
                 VK_NV_RAY_TRACING_EXTENSION_NAME,
-                VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME
                 //VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME, 
                 //VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME, 
                 //VK_KHR_MAINTENANCE3_EXTENSION_NAME,
                 //VK_KHR_PIPELINE_LIBRARY_EXTENSION_NAME, 
                 //VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME, 
                 //VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME
+            };
+            const std::vector<const char*> _instanceExtensions = {
+                //VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME
+
             };
 
         public:

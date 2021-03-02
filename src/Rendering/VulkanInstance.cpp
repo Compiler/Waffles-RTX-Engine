@@ -36,7 +36,6 @@ namespace Waffles{
         createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         createInfo.ppEnabledExtensionNames = extensions.data();
 
-
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
         if (enableValidationLayers) {
             LOG("Enabled validation layers: size: %d", static_cast<uint32_t>(_validationLayers.size()));
@@ -62,7 +61,6 @@ namespace Waffles{
     bool VulkanInstance::_deviceSupportsExtensions(VkPhysicalDevice device){
         uint32_t extensionCount;
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
-
         std::vector<VkExtensionProperties> availableExtensions(extensionCount);
         vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
 
@@ -77,6 +75,26 @@ namespace Waffles{
 
     SwapChainSupportDetails VulkanInstance::_querySwapChainSupport(VkPhysicalDevice device){
         SwapChainSupportDetails details;
+
+
+        uint32_t formatCount;
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, nullptr);
+
+        if (formatCount != 0) {
+            details.formats.resize(formatCount);
+            vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, details.formats.data());
+        }
+
+        uint32_t presentModeCount;
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, nullptr);
+
+        if (presentModeCount != 0) {
+            details.presentModes.resize(presentModeCount);
+            vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, details.presentModes.data());
+        }
+
+
+
         return details;
 
     }
@@ -113,7 +131,18 @@ namespace Waffles{
             LOG("Device supports RTX");
         }
 
-        return indices.isComplete() && extensionsSupported;
+        bool swapChainAdequate = false;
+        if (extensionsSupported) {
+            SwapChainSupportDetails swapChainSupport = _querySwapChainSupport(dev);
+            swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+            if(swapChainAdequate){
+                LOG("Swap chain adequate");
+            }else{
+                WARN("Swap chain inadequate");
+            }
+        }
+
+        return indices.isComplete() && extensionsSupported && swapChainAdequate;
     }
 
 
@@ -169,6 +198,14 @@ namespace Waffles{
 
         }
         return indices;
+    }
+
+    VkSurfaceFormatKHR  VulkanInstance::_chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats){
+        for (const auto& availableFormat : availableFormats) {
+            if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+                return availableFormat;
+            }
+        }
     }
 
     void VulkanInstance::_createLogicalDevice(){
