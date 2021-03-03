@@ -58,6 +58,8 @@ namespace Waffles{
             
             SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device);
             VkSurfaceFormatKHR _chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+            VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+            VkExtent2D _chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window);
 
             QueueFamilyIndices _getQueueFamilies(VkPhysicalDevice);
 
