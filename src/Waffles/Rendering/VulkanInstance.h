@@ -1,9 +1,9 @@
 #pragma once
-#include <Waffles.h>
+#include <Waffles/Waffles.h>
 #define GLFW_INCLUDE_VULKAN
-#include <Rendering/Window.h>
-#include <Startup/Startup.h>
-#include <Tools/Logging.h>
+#include <Waffles/Rendering/Window.h>
+#include <Waffles/Startup/Startup.h>
+#include <Waffles/Tools/Logging.h>
 #include <cstring>
 #include <string>
 #include <set>
@@ -55,6 +55,7 @@ namespace Waffles{
             void _createLogicalDevice();
             void _createSurface(GLFWwindow* window);
             bool _deviceSupportsExtensions(VkPhysicalDevice device);
+            void _createSwapChain(GLFWwindow* window);
             
             SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device);
             VkSurfaceFormatKHR _chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

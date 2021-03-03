@@ -1,6 +1,6 @@
 #pragma once
 #include <GLFW/glfw3.h>
-#include <Tools/Logging.h>
+#include <Waffles/Tools/Logging.h>
 #include <stdint.h>
 namespace Waffles{
 

@@ -1,14 +1,14 @@
 #pragma once
-#include <Waffles.h>
+#include <Waffles/Waffles.h>
 #define GLFW_INCLUDE_VULKAN
-#include <Rendering/Window.h>
-#include <Startup/Startup.h>
-#include <Tools/Logging.h>
+#include <Waffles/Rendering/Window.h>
+#include <Waffles/Startup/Startup.h>
+#include <Waffles/Tools/Logging.h>
 #include <vector>
 #include <cstring>
-#include <Rendering/VulkanInstance.h>
-#include <Tools/Input/InputManager.h>
-#include <Tools/Input/GLFWCallbacks.h>
+#include <Waffles/Rendering/VulkanInstance.h>
+#include <Waffles/Tools/Input/InputManager.h>
+#include <Waffles/Tools/Input/GLFWCallbacks.h>
 namespace Waffles{
 
     class EngineCore{

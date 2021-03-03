@@ -1,9 +1,9 @@
 #pragma once
-#include <Rendering/Window.h>
+#include <Waffles/Rendering/Window.h>
 #include <GLFW/glfw3.h>
 
-#include <Tools/Input/InputManager.h>
-#include <Tools/Logging.h>
+#include <Waffles/Tools/Input/InputManager.h>
+#include <Waffles/Tools/Logging.h>
 
 class GLFWCallbacks {
 

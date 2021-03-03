@@ -1,5 +1,5 @@
 #pragma once
-#include <Tools/Input/InputKeyStore.h>
+#include <Waffles/Tools/Input/InputKeyStore.h>
 #include <glm/vec2.hpp>
 #include <vector>
 #include <memory>

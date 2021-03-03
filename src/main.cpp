@@ -1,6 +1,6 @@
-#include <Waffles.h>
-#include <Tools/Logging.h>
-#include <Cores/RenderCore.h>
+#include <Waffles/Waffles.h>
+#include <Waffles/Tools/Logging.h>
+#include <Waffles/Cores/RenderCore.h>
 int main(){
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);

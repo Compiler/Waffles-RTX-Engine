@@ -1,6 +1,6 @@
 #pragma once
-#include <Tools/Logging.h>
-#include <Cores/EngineCore.h>
+#include <Waffles/Tools/Logging.h>
+#include <Waffles/Cores/EngineCore.h>
 
 namespace Waffles{
 

@@ -11,6 +11,7 @@ namespace Waffles{
         DEBUG_FUNC(_createSurface(window));
         DEBUG_FUNC(_setPhysicalDevice());
         DEBUG_FUNC(_createLogicalDevice());
+        DEBUG_FUNC(_createSwapChain(window));
     }
 
 
@@ -200,6 +201,45 @@ namespace Waffles{
         return indices;
     }
 
+    void VulkanInstance::_createSwapChain(GLFWwindow* window){
+        SwapChainSupportDetails swapChainSupport = _querySwapChainSupport(_physicalDevice);
+
+        VkSurfaceFormatKHR surfaceFormat = _chooseSwapSurfaceFormat(swapChainSupport.formats);
+        VkPresentModeKHR presentMode = _chooseSwapPresentMode(swapChainSupport.presentModes);
+        VkExtent2D extent = _chooseSwapExtent(swapChainSupport.capabilities, window);
+
+        uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
+        LOG("Swap chain contains %d images", imageCount);
+        if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
+            imageCount = swapChainSupport.capabilities.maxImageCount;
+            LOG("Swap chain adjusted to %d images", imageCount);
+        }
+
+        VkSwapchainCreateInfoKHR createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        createInfo.surface = _surface;
+        createInfo.minImageCount = imageCount;
+        createInfo.imageFormat = surfaceFormat.format;
+        createInfo.imageColorSpace = surfaceFormat.colorSpace;
+        createInfo.imageExtent = extent;
+        createInfo.imageArrayLayers = 1;
+        createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+        QueueFamilyIndices indices = _getQueueFamilies(_physicalDevice);
+        uint32_t queueFamilyIndices[] = {indices.graphicsFamily.index, indices.presentationFamily.index};
+
+        if (indices.graphicsFamily.index != indices.presentationFamily.index) {
+            createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+            createInfo.queueFamilyIndexCount = 2;
+            createInfo.pQueueFamilyIndices = queueFamilyIndices;
+        } else {
+            createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            createInfo.queueFamilyIndexCount = 0; // Optional
+            createInfo.pQueueFamilyIndices = nullptr; // Optional
+        }
+    }
+
+
     VkSurfaceFormatKHR  VulkanInstance::_chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats){
         for (const auto& availableFormat : availableFormats) {
             if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -210,6 +250,7 @@ namespace Waffles{
         LOG("Defaulting to any swap surface format");
         return availableFormats[0];
     }
+
 
     VkPresentModeKHR VulkanInstance::_chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes){
         for (const auto& availablePresentMode : availablePresentModes) {

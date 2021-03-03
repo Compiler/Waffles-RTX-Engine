@@ -6,7 +6,7 @@ CXXFLAGS = -std=$(C++_VERSION) -m64 -Wall -w -g -static-libgcc -static-libstdc++
 OUT_DIR = bin
 LAUNCHER_NAME = WafflesRTX
 SRC_DIR = src
-ENTRY_POINT = src/main.cpp
+ENTRY_POINT = $(SRC_DIR)/main.cpp
 
 #Libs
 VULKAN_ROOT = C:/VulkanSDK/1.2.162.1/
@@ -17,7 +17,7 @@ VULKAN_LIB = $(VULKAN_ROOT)Lib/
 GLFW_ROOT = extern/glfw-3.3.3.64/
 GLFW_INC = $(GLFW_ROOT)include
 GLFW_LIB = $(GLFW_ROOT)lib
-GLFW_SRC = $(GLFW_ROOT)src
+GLFW_$(SRC_DIR) = $(GLFW_ROOT)src
 
 GLM_ROOT = extern/glm/
 
@@ -50,16 +50,16 @@ release: $(ENTRY_POINT) $(OBJS)
 	$(ALL_SETTINGS) -O3 -DRELEASE_MODE -o $(OUT_DIR)/$(LAUNCHER_NAME) $^ $(LINKS)
 	./$(OUT_DIR)/$(LAUNCHER_NAME).exe
 
-$(CORE_OBJS): $(OUT_DIR)/%.o: src/Cores/%.cpp
+$(CORE_OBJS): $(OUT_DIR)/%.o: $(SRC_DIR)/Waffles/Cores/%.cpp
 	$(ALL_SETTINGS) -c $< -o $@  
 
-$(RENDERING_OBJS): $(OUT_DIR)/%.o: src/Rendering/%.cpp
+$(RENDERING_OBJS): $(OUT_DIR)/%.o: $(SRC_DIR)/Waffles/Rendering/%.cpp
 	$(ALL_SETTINGS) -c $< -o $@  
 
-$(STARTUP_OBJS): $(OUT_DIR)/%.o: src/Startup/%.cpp
+$(STARTUP_OBJS): $(OUT_DIR)/%.o: $(SRC_DIR)/Waffles/Startup/%.cpp
 	$(ALL_SETTINGS) -c $< -o $@  
 
-$(INPUT_OBJS): $(OUT_DIR)/%.o: src/Tools/Input/%.cpp
+$(INPUT_OBJS): $(OUT_DIR)/%.o: $(SRC_DIR)/Waffles/Tools/Input/%.cpp
 	$(ALL_SETTINGS) -c $< -o $@  
 
   

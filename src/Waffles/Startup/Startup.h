@@ -1,7 +1,7 @@
 #pragma once
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-#include <Tools/Logging.h>
+#include <Waffles/Tools/Logging.h>
 #include <vector>
 namespace Waffles{
 
