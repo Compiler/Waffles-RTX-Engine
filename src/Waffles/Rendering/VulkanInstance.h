@@ -64,7 +64,9 @@ namespace Waffles{
             void _createSwapChain(GLFWwindow* window);
             void _createImageViews();
             void _createGraphicsPipeline();
-            
+
+
+            VkShaderModule _createShaderModule(const std::vector<char>& code);
             SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device);
             VkSurfaceFormatKHR _chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
             VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);

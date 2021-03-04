@@ -20,8 +20,49 @@ namespace Waffles{
         auto vertShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_vert.spv"));
         auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_frag.spv"));
 
+        VkShaderModule vertShaderModule = _createShaderModule(vertShaderCode);
+        VkShaderModule fragShaderModule = _createShaderModule(fragShaderCode);
+
+
+        VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
+        vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+        vertShaderStageInfo.module = vertShaderModule;
+        vertShaderStageInfo.pName = "main";
+
+        VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
+        fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+        fragShaderStageInfo.module = fragShaderModule;
+        fragShaderStageInfo.pName = "main";
+
+        VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
+
+
+
+
+
+
+
+
+
+        vkDestroyShaderModule(_logicalDevice, vertShaderModule, nullptr);
+        vkDestroyShaderModule(_logicalDevice, fragShaderModule, nullptr);
     }
 
+    //wraps the code in a vkshadermodule object before being passed to the pipeline
+    //'code' is the bytecode representation of the glsl code - spirv 
+    VkShaderModule VulkanInstance::_createShaderModule(const std::vector<char>& code){
+        VkShaderModuleCreateInfo createInfo{};
+        createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        createInfo.codeSize = code.size();
+        createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+        VkShaderModule shaderModule;
+        if (vkCreateShaderModule(_logicalDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+            ERROR("failed to create shader module!");
+        }
+        return shaderModule;
+    }
 
     void VulkanInstance::_createInstance(const char* appName, const char* engineName){
         if(enableValidationLayers && !_validatationLayersAssert()){
