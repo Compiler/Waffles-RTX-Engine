@@ -29,10 +29,11 @@ LINKS = -lglfw3dll -lvulkan-1 -lpthread #-lVkLayer_utils
 
 #========================OBJECTS========================#
 STARTUP_OBJS = $(OUT_DIR)/Startup.o
+FILEUTIL_OBJS = $(OUT_DIR)/FileLoader.o
 RENDERING_OBJS = $(OUT_DIR)/Window.o $(OUT_DIR)/VulkanInstance.o
 INPUT_OBJS = $(OUT_DIR)/InputManager.o $(OUT_DIR)/GLFWCallbacks.o
 CORE_OBJS = $(OUT_DIR)/RenderCore.o $(OUT_DIR)/EngineCore.o
-OBJS = $(CORE_OBJS) $(ENGINE_CORE_OBJS) $(RENDERING_OBJS) $(STARTUP_OBJS) $(INPUT_OBJS)
+OBJS = $(CORE_OBJS) $(ENGINE_CORE_OBJS) $(RENDERING_OBJS) $(STARTUP_OBJS) $(INPUT_OBJS) $(FILEUTIL_OBJS)
 
 
 ALL_SETTINGS = $(CXX) $(CXXFLAGS) $(LIBS) $(INC) 
@@ -62,4 +63,5 @@ $(STARTUP_OBJS): $(OUT_DIR)/%.o: $(SRC_DIR)/Waffles/Startup/%.cpp
 $(INPUT_OBJS): $(OUT_DIR)/%.o: $(SRC_DIR)/Waffles/Tools/Input/%.cpp
 	$(ALL_SETTINGS) -c $< -o $@  
 
-  
+$(FILEUTIL_OBJS): $(OUT_DIR)/%.o: $(SRC_DIR)/Waffles/Tools/FileUtils/%.cpp
+	$(ALL_SETTINGS) -c $< -o $@  
