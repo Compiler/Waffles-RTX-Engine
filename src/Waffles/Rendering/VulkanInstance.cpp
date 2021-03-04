@@ -76,7 +76,7 @@ namespace Waffles{
 
     SwapChainSupportDetails VulkanInstance::_querySwapChainSupport(VkPhysicalDevice device){
         SwapChainSupportDetails details;
-
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _surface, &details.capabilities);
 
         uint32_t formatCount;
         vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, nullptr);
@@ -234,9 +234,17 @@ namespace Waffles{
             createInfo.pQueueFamilyIndices = queueFamilyIndices;
         } else {
             createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-            createInfo.queueFamilyIndexCount = 0; // Optional
-            createInfo.pQueueFamilyIndices = nullptr; // Optional
         }
+        createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+        createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; //specifies if the alpha channel should be used for blending with other windows
+        createInfo.presentMode = presentMode;
+        createInfo.clipped = VK_TRUE;
+        createInfo.oldSwapchain = VK_NULL_HANDLE;
+
+        if (vkCreateSwapchainKHR(_logicalDevice, &createInfo, nullptr, &_swapChain) != VK_SUCCESS) {
+            ERROR("failed to create swap chain!");
+        }
+
     }
 
 
@@ -268,7 +276,7 @@ namespace Waffles{
         } else {
             int width, height;
             glfwGetFramebufferSize(window, &width, &height);
-
+            DEBUG("(%d, %d)", width, height);
             VkExtent2D actualExtent = {
                 static_cast<uint32_t>(width),
                 static_cast<uint32_t>(height)
@@ -359,6 +367,7 @@ namespace Waffles{
 
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
+        vkDestroySwapchainKHR(_logicalDevice, _swapChain, nullptr);
         if(enableValidationLayers) DestroyDebugUtilsMessengerEXT(_vulkanInstance, _debugMessenger, nullptr);
         vkDestroySurfaceKHR(_vulkanInstance, _surface, nullptr);
         vkDestroyDevice(_logicalDevice, nullptr);

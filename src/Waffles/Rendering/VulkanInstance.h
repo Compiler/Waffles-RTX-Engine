@@ -46,6 +46,7 @@ namespace Waffles{
             VkQueue _graphicsQueue, _presentationQueue;
             VkSurfaceKHR _surface;
             VkDebugUtilsMessengerEXT _debugMessenger;
+            VkSwapchainKHR _swapChain;
 
             void _createInstance(const char* appName, const char* engineName);
             void _createDebugMessenger();
