@@ -47,6 +47,10 @@ namespace Waffles{
             VkSurfaceKHR _surface;
             VkDebugUtilsMessengerEXT _debugMessenger;
             VkSwapchainKHR _swapChain;
+            std::vector<VkImage> _swapChainImages;
+            std::vector<VkImageView> _swapChainImageViews;
+            VkFormat _swapChainImageFormat;
+            VkExtent2D _swapChainExtent;
 
             void _createInstance(const char* appName, const char* engineName);
             void _createDebugMessenger();
@@ -57,6 +61,7 @@ namespace Waffles{
             void _createSurface(GLFWwindow* window);
             bool _deviceSupportsExtensions(VkPhysicalDevice device);
             void _createSwapChain(GLFWwindow* window);
+            void _createImageViews();
             
             SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device);
             VkSurfaceFormatKHR _chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

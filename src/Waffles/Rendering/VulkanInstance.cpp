@@ -12,6 +12,7 @@ namespace Waffles{
         DEBUG_FUNC(_setPhysicalDevice());
         DEBUG_FUNC(_createLogicalDevice());
         DEBUG_FUNC(_createSwapChain(window));
+        DEBUG_FUNC(_createImageViews());
     }
 
 
@@ -68,7 +69,7 @@ namespace Waffles{
         std::set<std::string> requiredExtensions(_deviceExtensions.begin(), _deviceExtensions.end());
 
         for (const auto& extension : availableExtensions) {
-            LOG("Extension: '%s'", extension.extensionName);
+            //LOG("Extension: '%s'", extension.extensionName);
             requiredExtensions.erase(extension.extensionName);
         }
         return requiredExtensions.empty();
@@ -117,6 +118,32 @@ namespace Waffles{
             LOG("Debug Messenger successfully created.");
         }
     }
+
+    void VulkanInstance::_createImageViews(){
+        _swapChainImageViews.resize(_swapChainImages.size());
+
+        for (size_t i = 0; i < _swapChainImages.size(); i++) {
+            VkImageViewCreateInfo createInfo{};
+            createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            createInfo.image = _swapChainImages[i];
+            createInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            createInfo.format = _swapChainImageFormat; //VK_FORMAT_B8G8R8A8_SRGB
+            createInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            createInfo.subresourceRange.baseMipLevel = 0;
+            createInfo.subresourceRange.levelCount = 1;
+            createInfo.subresourceRange.baseArrayLayer = 0;
+            createInfo.subresourceRange.layerCount = 1;
+            if (vkCreateImageView(_logicalDevice, &createInfo, nullptr, &_swapChainImageViews[i]) != VK_SUCCESS) {
+                ERROR("failed to create image views!");
+            }
+
+        }   
+    }
+
 
     bool VulkanInstance::_isRTXEnabledGPU(VkPhysicalDevice dev){
         VkPhysicalDeviceProperties deviceProperties;
@@ -244,6 +271,11 @@ namespace Waffles{
         if (vkCreateSwapchainKHR(_logicalDevice, &createInfo, nullptr, &_swapChain) != VK_SUCCESS) {
             ERROR("failed to create swap chain!");
         }
+        vkGetSwapchainImagesKHR(_logicalDevice, _swapChain, &imageCount, nullptr);
+        _swapChainImages.resize(imageCount);
+        vkGetSwapchainImagesKHR(_logicalDevice, _swapChain, &imageCount, _swapChainImages.data());
+        _swapChainExtent = extent;
+        _swapChainImageFormat = surfaceFormat.format;
 
     }
 
@@ -367,6 +399,9 @@ namespace Waffles{
 
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
+        for (auto imageView : _swapChainImageViews) {
+            vkDestroyImageView(_logicalDevice, imageView, nullptr);
+        }
         vkDestroySwapchainKHR(_logicalDevice, _swapChain, nullptr);
         if(enableValidationLayers) DestroyDebugUtilsMessengerEXT(_vulkanInstance, _debugMessenger, nullptr);
         vkDestroySurfaceKHR(_vulkanInstance, _surface, nullptr);
