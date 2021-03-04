@@ -17,7 +17,8 @@ namespace Waffles{
     }
 
     void VulkanInstance::_createGraphicsPipeline(){
-        
+        auto vertShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_vert.spv"));
+        auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_frag.spv"));
 
     }
 

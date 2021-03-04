@@ -4,6 +4,7 @@
 #include <Waffles/Rendering/Window.h>
 #include <Waffles/Startup/Startup.h>
 #include <Waffles/Tools/Logging.h>
+#include <Waffles/Tools/FileUtils/FileLoader.h>
 #include <cstring>
 #include <string>
 #include <set>

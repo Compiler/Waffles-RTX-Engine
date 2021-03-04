@@ -4,6 +4,12 @@
 #include <vector>
 #include <fstream>
 
+#define WAFFLES_INTERNAL(x)         "src/Resources/" x
+#define WAFFLES_INTERNAL_SHADER(x)  WAFFLES_INTERNAL("Shaders/") x
+#define WAFFLES_INTERNAL_SHADER_SPIRV(x)  WAFFLES_INTERNAL("Shader_SPIRV/") x
+#define WAFFLES_INTERNAL_TEXTURE(x) WAFFLES_INTERNAL("Textures/") x
+#define WAFFLES_INTERNAL_MODEL(x)   WAFFLES_INTERNAL("Models/") x
+#define WAFFLES_INTERNAL_SOUNDS(x)  WAFFLES_INTERNAL("Sounds/") x
 namespace Waffles{
 
     class FileLoader{
