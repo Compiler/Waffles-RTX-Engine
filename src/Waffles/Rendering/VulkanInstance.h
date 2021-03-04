@@ -52,6 +52,7 @@ namespace Waffles{
             std::vector<VkImageView> _swapChainImageViews;
             VkFormat _swapChainImageFormat;
             VkExtent2D _swapChainExtent;
+            VkPipelineLayout _pipelineLayout;
 
             void _createInstance(const char* appName, const char* engineName);
             void _createDebugMessenger();
