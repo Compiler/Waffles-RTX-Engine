@@ -64,6 +64,7 @@ namespace Waffles{
             bool _deviceSupportsExtensions(VkPhysicalDevice device);
             void _createSwapChain(GLFWwindow* window);
             void _createImageViews();
+            void _createRenderPass();
             void _createGraphicsPipeline();
 
 
