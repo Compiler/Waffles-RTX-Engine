@@ -62,6 +62,7 @@ namespace Waffles{
             bool _deviceSupportsExtensions(VkPhysicalDevice device);
             void _createSwapChain(GLFWwindow* window);
             void _createImageViews();
+            void _createGraphicsPipeline();
             
             SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device);
             VkSurfaceFormatKHR _chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

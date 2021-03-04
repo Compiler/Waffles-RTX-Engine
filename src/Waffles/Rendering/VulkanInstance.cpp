@@ -13,6 +13,12 @@ namespace Waffles{
         DEBUG_FUNC(_createLogicalDevice());
         DEBUG_FUNC(_createSwapChain(window));
         DEBUG_FUNC(_createImageViews());
+        DEBUG_FUNC(_createGraphicsPipeline());
+    }
+
+    void VulkanInstance::_createGraphicsPipeline(){
+        
+
     }
 
 
