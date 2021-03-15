@@ -1,6 +1,3 @@
-
-
-
 add_library(
     Waffles SHARED
 
@@ -32,17 +29,34 @@ add_library(
 
 )
 
+
+add_custom_command(TARGET Waffles PRE_BUILD        
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  
+    "${VULKAN_ROOT}/Lib/vulkan-1.lib"      
+    "${EXECUTABLE_OUTPUT_PATH}")                 
+
+add_custom_command(TARGET Waffles PRE_BUILD        
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  
+    "${GLFW_ABS_LIB}/glfw3dll.lib"      
+    "${EXECUTABLE_OUTPUT_PATH}")  
+
+add_custom_command(TARGET Waffles PRE_BUILD        
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  
+    "${GLFW_ABS_LIB}/glfw3.dll"      
+    "${EXECUTABLE_OUTPUT_PATH}")  
+
+
 target_compile_definitions(Waffles PUBLIC WAFFLE_DEBUG_MODE=1)
 
 target_include_directories(Waffles PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
-target_include_directories(Waffles PUBLIC "../extern/glfw-3.3.3.64/include")
-target_include_directories(Waffles PUBLIC "../extern/glm")
-target_include_directories(Waffles PUBLIC "../extern/stbimage")
-target_include_directories(Waffles PUBLIC "${VULKAN_ROOT}/Include")
+target_include_directories(Waffles PUBLIC "${GLFW_ABS_INCLUDE}")
+target_include_directories(Waffles PUBLIC "${EXTERN_DIR}/glm")
+target_include_directories(Waffles PUBLIC "${EXTERN_DIR}/stbimage")
+target_include_directories(Waffles PUBLIC "${VULKAN_INCLUDE}")
 
 
-target_link_directories(Waffles PUBLIC "../extern/glfw-3.3.3.64/lib/")
-target_link_directories(Waffles PUBLIC "${VULKAN_ROOT}/lib/")
+target_link_directories(Waffles PUBLIC "${GLFW_ABS_LIB}")
+target_link_directories(Waffles PUBLIC "${VULKAN_LIB}")
 target_link_libraries(Waffles glfw3dll)
 target_link_libraries(Waffles vulkan-1)
 target_link_libraries(Waffles pthread)
@@ -53,4 +67,4 @@ target_link_libraries(Waffles pthread)
 find_package(OpenGL REQUIRED)
 target_link_libraries(Waffles OpenGL::GL)
 
-#add_compile_options(-lglfw3dll)
+
