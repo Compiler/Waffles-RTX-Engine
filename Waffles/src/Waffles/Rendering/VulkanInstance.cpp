@@ -439,6 +439,7 @@ namespace Waffles{
         
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
+            DEBUG("Device allows: %d of these flags: %s", queueFamily.queueCount, _queueFamilyBitToString(queueFamily.queueFlags).c_str());
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
                 indices.graphicsFamily.index = i;
                 indices.graphicsFamily.set = true;
@@ -624,7 +625,6 @@ namespace Waffles{
         }
         return true;
     }
-
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
         for (auto framebuffer : _swapChainFramebuffers) {
@@ -641,6 +641,7 @@ namespace Waffles{
         vkDestroySurfaceKHR(_vulkanInstance, _surface, nullptr);
         vkDestroyDevice(_logicalDevice, nullptr);
         vkDestroyInstance(_vulkanInstance, nullptr);
+        
 
     }
 }

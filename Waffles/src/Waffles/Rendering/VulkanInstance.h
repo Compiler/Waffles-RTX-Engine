@@ -56,6 +56,7 @@ namespace Waffles{
             VkRenderPass _renderPass;
             VkPipeline _graphicsPipeline;
             std::vector<VkFramebuffer> _swapChainFramebuffers;
+            VkCommandPool _commandPool;
 
             void _createInstance(const char* appName, const char* engineName);
             void _createDebugMessenger();
@@ -70,6 +71,7 @@ namespace Waffles{
             void _createRenderPass();
             void _createGraphicsPipeline();
             void _createFrameBuffers();
+            void _createCommandPool();
 
 
             VkShaderModule _createShaderModule(const std::vector<char>& code);
@@ -156,6 +158,33 @@ namespace Waffles{
                 if (func != nullptr) {
                     func(instance, debugMessenger, pAllocator);
                 }
+            }
+
+            std::string _queueFamilyBitToString(int value){
+                std::string stringVersion = "{";
+                    // VK_QUEUE_GRAPHICS_BIT = 0x00000001,
+                    // VK_QUEUE_COMPUTE_BIT = 0x00000002,
+                    // VK_QUEUE_TRANSFER_BIT = 0x00000004,
+                    // VK_QUEUE_SPARSE_BINDING_BIT = 0x00000008,
+                    // VK_QUEUE_PROTECTED_BIT = 0x00000010,
+                    // VK_QUEUE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
+                int c = 0;
+                if((value & ( 1 << c )) >> c++ == 1){
+                    stringVersion += " GRAPHICS ";
+                }
+                if((value & ( 1 << c )) >> c++ == 1){
+                    stringVersion += " COMPUTE ";
+                }
+                if((value & ( 1 << c )) >> c++ == 1){
+                    stringVersion += " TRANSFER ";
+                }
+                if((value & ( 1 << c )) >> c++ == 1){
+                    stringVersion += " SPARSE ";
+                }
+
+
+                return stringVersion + "}";
+
             }
 
         };
