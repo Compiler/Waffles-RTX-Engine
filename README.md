@@ -1,6 +1,19 @@
 # Vulkan Ray Tracing
 
 ## How to use:
-Because the size of vulkans sdk is too large, when cloning you must change the makefile so that VULKAN_ROOT points to your sdk location. 
-For ex:
-C:/VulkanSDK/1.2.xxx.x/
+
+### Window + MinGW64
+
+  - Under Waffles-RTX-Engine, there is a CMakeLists.txt-- open it and change VULKAN_ROOT to point to your vulkan sdk path:
+
+      - i.e. C:/VulkanSDK/1.2.xxx.x/
+
+  - Then, make a folder under Waffles-RTX-Engine named build, cd into it and run 
+
+```
+> cmake -G "MinGW Makefiles" ..
+> make
+> ./WafflesDriver.exe
+```
+
+
