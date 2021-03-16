@@ -53,6 +53,7 @@ namespace Waffles{
             VkFormat _swapChainImageFormat;
             VkExtent2D _swapChainExtent;
             VkPipelineLayout _pipelineLayout;
+            VkRenderPass _renderPass;
 
             void _createInstance(const char* appName, const char* engineName);
             void _createDebugMessenger();

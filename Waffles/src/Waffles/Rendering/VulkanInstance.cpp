@@ -35,7 +35,19 @@ namespace Waffles{
         VkSubpassDescription subpass{};
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
         subpass.colorAttachmentCount = 1;
-        subpass.pColorAttachments = &colorAttachmentRef;   
+        subpass.pColorAttachments = &colorAttachmentRef; 
+
+
+        VkRenderPassCreateInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        renderPassInfo.attachmentCount = 1;
+        renderPassInfo.pAttachments = &colorAttachment;
+        renderPassInfo.subpassCount = 1;
+        renderPassInfo.pSubpasses = &subpass;
+
+        if (vkCreateRenderPass(_logicalDevice, &renderPassInfo, nullptr, &_renderPass) != VK_SUCCESS) {
+            ERROR("failed to create render pass!");
+        }  
 
     }
 
@@ -570,6 +582,7 @@ namespace Waffles{
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
         vkDestroyPipelineLayout(_logicalDevice, _pipelineLayout, nullptr);
+        vkDestroyRenderPass(_logicalDevice, _renderPass, nullptr);
         for (auto imageView : _swapChainImageViews) {
             vkDestroyImageView(_logicalDevice, imageView, nullptr);
         }
