@@ -15,6 +15,31 @@ namespace Waffles{
         DEBUG_FUNC(_createImageViews());
         DEBUG_FUNC(_createRenderPass());
         DEBUG_FUNC(_createGraphicsPipeline());
+        DEBUG_FUNC(_createFrameBuffers());
+    }
+
+    void VulkanInstance::_createFrameBuffers(){
+        _swapChainFramebuffers.resize(_swapChainImageViews.size());
+
+        for (size_t i = 0; i < _swapChainImageViews.size(); i++) {
+            VkImageView attachments[] = {
+                _swapChainImageViews[i]
+            };
+
+            VkFramebufferCreateInfo framebufferInfo{};
+            framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            framebufferInfo.renderPass = _renderPass;
+            framebufferInfo.attachmentCount = 1;
+            framebufferInfo.pAttachments = attachments;
+            framebufferInfo.width = _swapChainExtent.width;
+            framebufferInfo.height = _swapChainExtent.height;
+            framebufferInfo.layers = 1;
+
+            if (vkCreateFramebuffer(_logicalDevice, &framebufferInfo, nullptr, &_swapChainFramebuffers[i]) != VK_SUCCESS) {
+                ERROR("failed to create framebuffer!");
+            }
+        }
+
     }
     void VulkanInstance::_createRenderPass(){
         VkAttachmentDescription colorAttachment{};
@@ -179,6 +204,27 @@ namespace Waffles{
         }
 
 
+        VkGraphicsPipelineCreateInfo pipelineInfo{};
+        pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipelineInfo.stageCount = 2;
+        pipelineInfo.pStages = shaderStages;
+        pipelineInfo.pVertexInputState = &vertexInputInfo;
+        pipelineInfo.pInputAssemblyState = &inputAssembly;
+        pipelineInfo.pViewportState = &viewportState;
+        pipelineInfo.pRasterizationState = &rasterizer;
+        pipelineInfo.pMultisampleState = &multisampling;
+        pipelineInfo.pDepthStencilState = nullptr; // Optional
+        pipelineInfo.pColorBlendState = &colorBlending;
+        pipelineInfo.pDynamicState = nullptr; // Optional
+        pipelineInfo.layout = _pipelineLayout;
+        pipelineInfo.renderPass = _renderPass;
+        pipelineInfo.subpass = 0;
+        pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
+        pipelineInfo.basePipelineIndex = -1; // Optional        
+
+        if (vkCreateGraphicsPipelines(_logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_graphicsPipeline) != VK_SUCCESS) {
+            ERROR("failed to create graphics pipeline!");
+        }
 
         vkDestroyShaderModule(_logicalDevice, vertShaderModule, nullptr);
         vkDestroyShaderModule(_logicalDevice, fragShaderModule, nullptr);
@@ -581,6 +627,10 @@ namespace Waffles{
 
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
+        for (auto framebuffer : _swapChainFramebuffers) {
+            vkDestroyFramebuffer(_logicalDevice, framebuffer, nullptr);
+        }
+        vkDestroyPipeline(_logicalDevice, _graphicsPipeline, nullptr);
         vkDestroyPipelineLayout(_logicalDevice, _pipelineLayout, nullptr);
         vkDestroyRenderPass(_logicalDevice, _renderPass, nullptr);
         for (auto imageView : _swapChainImageViews) {
