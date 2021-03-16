@@ -16,4 +16,15 @@
 > ./WafflesDriver.exe
 ```
 
+Here is in theory the entire load you can write, but you need to have the correct sdk version:
 
+```
+> git clone https://github.com/Compiler/Waffles-RTX-Engine.git
+> cd Waffles-RTX-Engine
+> mkdir build
+> cd build
+HERE IS WHERE YOU WOULD STOP AND CHANGE THE VULKAN SDK VERSION TO YOURS in Waffles-RTX-Engine/CMakeLists.txt
+> cmake -G "MinGW Makefiles" ..
+> make
+> ./WafflesDriver.exe
+```
