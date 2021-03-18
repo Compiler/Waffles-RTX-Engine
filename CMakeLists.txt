@@ -7,11 +7,13 @@ set(VULKAN_INCLUDE "${VULKAN_ROOT}/Include")
 
 
 set(GLFW_ROOT extern/glfw-3.3.3.64)
-set(GLFW_LIB "${GLFW_ROOT}/lib/")
-set(GLFW_INCLUDE "${GLFW_ROOT}/include/")
 set(GLFW_ABS_ROOT "${CMAKE_SOURCE_DIR}/${GLFW_ROOT}")
 set(GLFW_ABS_LIB "${GLFW_ABS_ROOT}/lib")
 set(GLFW_ABS_INCLUDE "${GLFW_ABS_ROOT}/include")
+
+set(ENTT_ROOT extern/entt)
+set(ENTT_ABS_ROOT "${CMAKE_SOURCE_DIR}/${ENTT_ROOT}")
+
 
 set(EXTERN_DIR "${CMAKE_SOURCE_DIR}/extern")
 

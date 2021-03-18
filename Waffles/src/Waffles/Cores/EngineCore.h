@@ -9,6 +9,10 @@
 #include <Waffles/Rendering/VulkanInstance.h>
 #include <Waffles/Tools/Input/InputManager.h>
 #include <Waffles/Tools/Input/GLFWCallbacks.h>
+
+#include <entt/entt.hpp>
+#include <entt/entity/registry.hpp>
+
 namespace Waffles{
 
     class EngineCore{

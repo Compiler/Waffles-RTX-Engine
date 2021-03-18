@@ -1,3 +1,5 @@
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(
     Waffles SHARED
 
@@ -49,6 +51,7 @@ add_custom_command(TARGET Waffles PRE_BUILD
 target_compile_definitions(Waffles PUBLIC WAFFLE_DEBUG_MODE=1)
 
 target_include_directories(Waffles PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(Waffles PUBLIC "${ENTT_ABS_ROOT}")
 target_include_directories(Waffles PUBLIC "${GLFW_ABS_INCLUDE}")
 target_include_directories(Waffles PUBLIC "${EXTERN_DIR}/glm")
 target_include_directories(Waffles PUBLIC "${EXTERN_DIR}/stbimage")
