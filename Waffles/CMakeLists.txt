@@ -1,5 +1,6 @@
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 add_library(
     Waffles SHARED
 
@@ -27,7 +28,9 @@ add_library(
     src/Waffles/Tools/Input/InputManager.cpp
     src/Waffles/Tools/Input/InputManager.h
     src/Waffles/Tools/Logging.h
-
+    
+    src/Waffles/Tools/DebugUtils/VkDebugUtils.h
+    src/Waffles/Tools/DebugUtils/VkDebugUtils.cpp
 
 )
 

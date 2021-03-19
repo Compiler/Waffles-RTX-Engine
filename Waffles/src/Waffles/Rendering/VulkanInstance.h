@@ -5,6 +5,7 @@
 #include <Waffles/Startup/Startup.h>
 #include <Waffles/Tools/Logging.h>
 #include <Waffles/Tools/FileUtils/FileLoader.h>
+#include <Waffles/Tools/DebugUtils/VkDebugUtils.h>
 #include <cstring>
 #include <string>
 #include <set>
@@ -160,32 +161,7 @@ namespace Waffles{
                 }
             }
 
-            std::string _queueFamilyBitToString(int value){
-                std::string stringVersion = "{";
-                    // VK_QUEUE_GRAPHICS_BIT = 0x00000001,
-                    // VK_QUEUE_COMPUTE_BIT = 0x00000002,
-                    // VK_QUEUE_TRANSFER_BIT = 0x00000004,
-                    // VK_QUEUE_SPARSE_BINDING_BIT = 0x00000008,
-                    // VK_QUEUE_PROTECTED_BIT = 0x00000010,
-                    // VK_QUEUE_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF
-                int c = 0;
-                if((value & ( 1 << c )) >> c++ == 1){
-                    stringVersion += " GRAPHICS ";
-                }
-                if((value & ( 1 << c )) >> c++ == 1){
-                    stringVersion += " COMPUTE ";
-                }
-                if((value & ( 1 << c )) >> c++ == 1){
-                    stringVersion += " TRANSFER ";
-                }
-                if((value & ( 1 << c )) >> c++ == 1){
-                    stringVersion += " SPARSE ";
-                }
-
-
-                return stringVersion + "}";
-
-            }
+            
 
         };
 

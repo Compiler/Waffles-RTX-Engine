@@ -1,7 +1,6 @@
 #include "VulkanInstance.h"
 
 namespace Waffles{
-
     void VulkanInstance::load(GLFWwindow* window){
         uint32_t extensionCount = 0;
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -439,7 +438,7 @@ namespace Waffles{
         
         int i = 0;
         for (const auto& queueFamily : queueFamilies) {
-            DEBUG("Device allows: %d of these flags: %s", queueFamily.queueCount, _queueFamilyBitToString(queueFamily.queueFlags).c_str());
+            DEBUG("Device allows: %d of these flags: %s", queueFamily.queueCount, queueFamilyBitToString(queueFamily.queueFlags).c_str());
             if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT){
                 indices.graphicsFamily.index = i;
                 indices.graphicsFamily.set = true;
@@ -522,11 +521,17 @@ namespace Waffles{
 
 
     VkPresentModeKHR VulkanInstance::_chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes){
+        #ifdef DEBUG_MODE
+            int mode = 0;
+            for (const auto& availablePresentMode : availablePresentModes) mode += availablePresentMode;
+            
+            DEBUG("Swapchain presentation mode allows: %s", presentModeBitToString(mode).c_str());
+        #endif
         for (const auto& availablePresentMode : availablePresentModes) {
-                if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-                    return availablePresentMode;
-                }
+            if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+                return availablePresentMode;
             }
+        }
 
             return VK_PRESENT_MODE_FIFO_KHR;
     }
