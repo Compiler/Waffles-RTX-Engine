@@ -82,6 +82,7 @@ namespace Waffles{
             std::vector<VkSemaphore> _s_imagesAvailable;
             std::vector<VkSemaphore> _s_rendersFinished;
             std::vector<VkFence> _f_inFlightFences;
+            std::vector<VkFence> _f_imagesInFlight;
 
 
 

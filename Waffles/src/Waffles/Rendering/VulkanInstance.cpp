@@ -24,11 +24,12 @@ namespace Waffles{
 
     void VulkanInstance::render(){
         vkWaitForFences(_logicalDevice, 1, &_f_inFlightFences[_currentFrame], VK_TRUE, UINT64_MAX);
-        vkResetFences(_logicalDevice, 1, &_f_inFlightFences[_currentFrame]);
 
 
         uint32_t imageIndex;
         vkAcquireNextImageKHR(_logicalDevice, _swapChain, UINT64_MAX, _s_imagesAvailable[_currentFrame], VK_NULL_HANDLE, &imageIndex);
+        if(_f_imagesInFlight[imageIndex] != VK_NULL_HANDLE) vkWaitForFences(_logicalDevice, 1, &_f_imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
+        _f_imagesInFlight[imageIndex] = _f_inFlightFences[_currentFrame];
 
 
         VkSubmitInfo submitInfo{};
@@ -44,6 +45,8 @@ namespace Waffles{
         submitInfo.pCommandBuffers = &_graphicsCommandBuffers[imageIndex];
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
+        
+        vkResetFences(_logicalDevice, 1, &_f_inFlightFences[_currentFrame]);
 
         if (vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _f_inFlightFences[_currentFrame]) != VK_SUCCESS) {
             ERROR("Failed to submit draw command buffer!");
@@ -80,6 +83,7 @@ namespace Waffles{
 
     void VulkanInstance::_createSyncObjects(){
         _f_inFlightFences.resize(_MAX_FRAMES_IN_FLIGHT);
+        _f_imagesInFlight.resize(_swapChainImages.size(), VK_NULL_HANDLE);
         _s_imagesAvailable.resize(_MAX_FRAMES_IN_FLIGHT);
         _s_rendersFinished.resize(_MAX_FRAMES_IN_FLIGHT);
         VkSemaphoreCreateInfo semaphoreInfo{};
