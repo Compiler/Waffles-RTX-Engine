@@ -16,6 +16,54 @@ namespace Waffles{
         DEBUG_FUNC(_createGraphicsPipeline());
         DEBUG_FUNC(_createFrameBuffers());
         DEBUG_FUNC(_createGraphicsCommandPool());
+        DEBUG_FUNC(_createGraphicsCommandPool());
+        DEBUG_FUNC(_createGraphicsCommandBuffers());
+    }
+    
+    void VulkanInstance::_createGraphicsCommandBuffers(){
+        _graphicsCommandBuffers.resize(_swapChainFramebuffers.size());
+
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;  
+        allocInfo.commandPool = _graphicsCommandPool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = (uint32_t) _graphicsCommandBuffers.size();
+
+        if(vkAllocateCommandBuffers(_logicalDevice, &allocInfo, _graphicsCommandBuffers.data()) != VK_SUCCESS){
+            ERROR("Failed to allocate graphics command buffers from graphics command pool");
+        }
+
+        //begin recording commands to buffers
+        for(size_t i = 0; i < _graphicsCommandBuffers.size(); i++){
+            VkCommandBufferBeginInfo info;
+            info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            info.flags = 0; 
+            info.pInheritanceInfo = nullptr; 
+            info.pNext = nullptr;
+            
+            if(vkBeginCommandBuffer(_graphicsCommandBuffers[i], &info) != VK_SUCCESS){
+                ERROR("Failed to begin recording command buffers");
+            }
+            VkRenderPassBeginInfo renderPassInfo{};
+            renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            renderPassInfo.renderPass = _renderPass;
+            renderPassInfo.framebuffer = _swapChainFramebuffers[i];
+            renderPassInfo.renderArea.offset = {0, 0};
+            renderPassInfo.renderArea.extent = _swapChainExtent;
+            renderPassInfo.clearValueCount = VK_ATTACHMENT_LOAD_OP_CLEAR;
+            renderPassInfo.pClearValues = &_clearColor;
+
+            vkCmdBeginRenderPass(_graphicsCommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+            vkCmdBindPipeline(_graphicsCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, _graphicsPipeline); //VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR
+            vkCmdDraw(_graphicsCommandBuffers[i], 3, 1, 0, 0);
+
+            vkCmdEndRenderPass(_graphicsCommandBuffers[i]);
+            if(vkEndCommandBuffer(_graphicsCommandBuffers[i]) != VK_SUCCESS){
+                ERROR("Failed to record to command buffer");
+            }
+
+        }
+
     }
 
     void VulkanInstance::_createGraphicsCommandPool(){

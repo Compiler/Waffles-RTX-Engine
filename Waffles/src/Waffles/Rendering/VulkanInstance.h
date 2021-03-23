@@ -73,6 +73,8 @@ namespace Waffles{
             void _createGraphicsPipeline();
             void _createFrameBuffers();
             void _createGraphicsCommandPool();
+            void _createGraphicsCommandBuffers();
+
 
 
             VkShaderModule _createShaderModule(const std::vector<char>& code);
@@ -83,6 +85,7 @@ namespace Waffles{
 
             QueueFamilyIndices _getQueueFamilies(VkPhysicalDevice);
 
+            std::vector<VkCommandBuffer> _graphicsCommandBuffers;
             const std::vector<const char*> _validationLayers = {
                 "VK_LAYER_KHRONOS_validation"
             };
@@ -101,6 +104,10 @@ namespace Waffles{
                 //VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME
 
             };
+
+
+
+            VkClearValue _clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 
         public:
 
