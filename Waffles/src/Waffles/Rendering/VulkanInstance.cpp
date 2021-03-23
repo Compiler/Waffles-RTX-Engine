@@ -101,7 +101,7 @@ namespace Waffles{
         for(size_t i = 0; i < _graphicsCommandBuffers.size(); i++){
             VkCommandBufferBeginInfo info;
             info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-            info.flags = 0; 
+            info.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT; 
             info.pInheritanceInfo = nullptr; 
             info.pNext = nullptr;
             
