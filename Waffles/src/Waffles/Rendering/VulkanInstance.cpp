@@ -646,7 +646,7 @@ namespace Waffles{
 
         VkSurfaceFormatKHR surfaceFormat = _chooseSwapSurfaceFormat(swapChainSupport.formats);
         VkPresentModeKHR presentMode = _chooseSwapPresentMode(swapChainSupport.presentModes);
-        VkExtent2D extent = _chooseSwapExtent(swapChainSupport.capabilities, _windowRef);
+        VkExtent2D extent = _chooseSwapExtent(swapChainSupport.capabilities);
 
         uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
         LOG("Swap chain contains %d images", imageCount);
