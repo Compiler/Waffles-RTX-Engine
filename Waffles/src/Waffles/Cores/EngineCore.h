@@ -6,7 +6,6 @@
 #include <Waffles/Tools/Logging.h>
 #include <vector>
 #include <cstring>
-#include <Waffles/Rendering/VulkanInstance.h>
 #include <Waffles/Tools/Input/InputManager.h>
 #include <Waffles/Tools/Input/GLFWCallbacks.h>
 
@@ -20,7 +19,6 @@ namespace Waffles{
 
         private:
             Window* _window;
-            VulkanInstance _vkInstance;
             Waffles::RenderCore _rasterizedCore;
 
 

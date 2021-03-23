@@ -8,8 +8,7 @@ namespace Waffles{
         const char* appName = "Waffles-RTX-PBR";
         _window = new Waffles::Window(720, 720.0 / (16.0 / 9.0), appName);
         GLFWCallbacks::initCallBacks(_window);
-        _vkInstance.load(_window->getWindow());
-        _rasterizedCore.load();
+        _rasterizedCore.load(_window);
        
     }
 
@@ -31,7 +30,6 @@ namespace Waffles{
 
     void EngineCore::unload(){
         UNLOAD_LOG("Unloading EngineCore...");
-        _vkInstance.unload();
         _rasterizedCore.unload();
         _window->destroy();
         delete(_window);

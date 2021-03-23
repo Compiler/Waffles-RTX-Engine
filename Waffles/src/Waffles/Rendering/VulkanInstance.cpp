@@ -18,6 +18,70 @@ namespace Waffles{
         DEBUG_FUNC(_createGraphicsCommandPool());
         DEBUG_FUNC(_createGraphicsCommandPool());
         DEBUG_FUNC(_createGraphicsCommandBuffers());
+        DEBUG_FUNC(_createSemaphores());
+    }
+
+
+    void VulkanInstance::render(){
+        uint32_t imageIndex;
+        vkAcquireNextImageKHR(_logicalDevice, _swapChain, UINT64_MAX, _s_imageAvailable, VK_NULL_HANDLE, &imageIndex);
+
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {_s_imageAvailable};
+        VkSemaphore signalSemaphores[] = {_s_renderFinished};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &_graphicsCommandBuffers[imageIndex];
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+            ERROR("Failed to submit draw command buffer!");
+        }
+
+
+
+        VkSubpassDependency dependency{};
+        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+        dependency.dstSubpass = 0;
+        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.srcAccessMask = 0;
+        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {_swapChain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+        presentInfo.pImageIndices = &imageIndex;
+        presentInfo.pResults = nullptr; // Optional
+
+        vkQueuePresentKHR(_presentationQueue, &presentInfo);
+
+    }
+
+    void VulkanInstance::_createSemaphores(){
+        VkSemaphoreCreateInfo semaphoreInfo{};
+        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+        if (vkCreateSemaphore(_logicalDevice, &semaphoreInfo, nullptr, &_s_imageAvailable) != VK_SUCCESS || vkCreateSemaphore(_logicalDevice, &semaphoreInfo, nullptr, &_s_renderFinished) != VK_SUCCESS) {
+
+           ERROR("Failed to create semaphores!");
+        }
+
+
     }
     
     void VulkanInstance::_createGraphicsCommandBuffers(){
@@ -692,6 +756,8 @@ namespace Waffles{
     }
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
+        vkDestroySemaphore(_logicalDevice, _s_imageAvailable, nullptr);
+        vkDestroySemaphore(_logicalDevice, _s_renderFinished, nullptr);
         vkDestroyCommandPool(_logicalDevice, _graphicsCommandPool, nullptr);
         for (auto framebuffer : _swapChainFramebuffers) {
             vkDestroyFramebuffer(_logicalDevice, framebuffer, nullptr);

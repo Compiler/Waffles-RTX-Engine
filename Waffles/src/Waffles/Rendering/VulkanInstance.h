@@ -74,6 +74,9 @@ namespace Waffles{
             void _createFrameBuffers();
             void _createGraphicsCommandPool();
             void _createGraphicsCommandBuffers();
+            void _createSemaphores();
+
+            VkSemaphore _s_imageAvailable, _s_renderFinished;
 
 
 
@@ -113,6 +116,7 @@ namespace Waffles{
 
             void load(GLFWwindow* window);
 
+            void render();
 
             void unload();
 

@@ -1,8 +1,11 @@
 #include "RenderCore.h"
 namespace Waffles{
 
-    void RenderCore::load(){
+    void RenderCore::load(Waffles::Window* windowRef){
         INIT_LOG("RenderCore Loading...");
+
+        _vkInstance.load(windowRef->getWindow());
+
     }
 
     void RenderCore::update(){
@@ -11,7 +14,7 @@ namespace Waffles{
     }   
 
     void RenderCore::render(){
-
+        _vkInstance.render();
     }
 
     void RenderCore::unload(){
