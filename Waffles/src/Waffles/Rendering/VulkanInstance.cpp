@@ -15,8 +15,20 @@ namespace Waffles{
         DEBUG_FUNC(_createRenderPass());
         DEBUG_FUNC(_createGraphicsPipeline());
         DEBUG_FUNC(_createFrameBuffers());
+        DEBUG_FUNC(_createGraphicsCommandPool());
     }
 
+    void VulkanInstance::_createGraphicsCommandPool(){
+        QueueFamilyIndices queueFamilyIndices = _getQueueFamilies(_physicalDevice);
+
+        VkCommandPoolCreateInfo poolInfo{};
+        poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.index;
+
+        if((vkCreateCommandPool(_logicalDevice, &poolInfo, nullptr, &_graphicsCommandPool)) != VK_SUCCESS){
+            ERROR("Failed to create graphics command pool");
+        }
+    }
     void VulkanInstance::_createFrameBuffers(){
         _swapChainFramebuffers.resize(_swapChainImageViews.size());
 
@@ -632,6 +644,7 @@ namespace Waffles{
     }
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
+        vkDestroyCommandPool(_logicalDevice, _graphicsCommandPool, nullptr);
         for (auto framebuffer : _swapChainFramebuffers) {
             vkDestroyFramebuffer(_logicalDevice, framebuffer, nullptr);
         }

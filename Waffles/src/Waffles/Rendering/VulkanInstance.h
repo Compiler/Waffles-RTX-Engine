@@ -57,7 +57,7 @@ namespace Waffles{
             VkRenderPass _renderPass;
             VkPipeline _graphicsPipeline;
             std::vector<VkFramebuffer> _swapChainFramebuffers;
-            VkCommandPool _commandPool;
+            VkCommandPool _graphicsCommandPool;
 
             void _createInstance(const char* appName, const char* engineName);
             void _createDebugMessenger();
@@ -72,7 +72,7 @@ namespace Waffles{
             void _createRenderPass();
             void _createGraphicsPipeline();
             void _createFrameBuffers();
-            void _createCommandPool();
+            void _createGraphicsCommandPool();
 
 
             VkShaderModule _createShaderModule(const std::vector<char>& code);
