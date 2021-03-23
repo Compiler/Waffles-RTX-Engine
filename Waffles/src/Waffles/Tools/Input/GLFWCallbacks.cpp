@@ -2,7 +2,6 @@
 
 
 void GLFWCallbacks::framebufferResizeCallback(GLFWwindow* window, int width, int height){
-	LOG("Resized");
 	Waffles::WINDOW_WIDTH = width;
 	Waffles::WINDOW_HEIGHT = height;
 	glfwSetWindowSize(window, Waffles::WINDOW_WIDTH, Waffles::WINDOW_HEIGHT);
