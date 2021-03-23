@@ -1,12 +1,19 @@
 #include "GLFWCallbacks.h"
 
 
+void GLFWCallbacks::framebufferResizeCallback(GLFWwindow* window, int width, int height){
+	LOG("Resized");
+	Waffles::WINDOW_WIDTH = width;
+	Waffles::WINDOW_HEIGHT = height;
+	glfwSetWindowSize(window, Waffles::WINDOW_WIDTH, Waffles::WINDOW_HEIGHT);
+}
 
 void GLFWCallbacks::initCallBacks(Waffles::Window* _windowRef){
 	INIT_LOG("GLFWCallbacks Loading...");
 	glfwSetKeyCallback(_windowRef->getWindow(), GLFWCallbacks::keyCallback);
 	glfwSetCursorPosCallback(_windowRef->getWindow(), GLFWCallbacks::cursorPositionCallback);
 	glfwSetMouseButtonCallback(_windowRef->getWindow(), GLFWCallbacks::mouseClickCallback);
+	glfwSetFramebufferSizeCallback(_windowRef->getWindow(), GLFWCallbacks::framebufferResizeCallback);
 }
 void GLFWCallbacks::mouseClickCallback(GLFWwindow* window, int button, int action, int mods) {
 	static uint16_t mouseKey;

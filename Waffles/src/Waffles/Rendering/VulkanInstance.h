@@ -2,7 +2,6 @@
 #include <Waffles/Waffles.h>
 #define GLFW_INCLUDE_VULKAN
 #include <Waffles/Startup/Startup.h>
-#include <Waffles/Tools/Logging.h>
 #include <Waffles/Tools/FileUtils/FileLoader.h>
 #include <Waffles/Tools/DebugUtils/VkDebugUtils.h>
 #include <cstring>

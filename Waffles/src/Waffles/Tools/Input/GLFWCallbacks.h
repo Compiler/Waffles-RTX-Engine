@@ -15,5 +15,6 @@ public:
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 	static void initCallBacks(Waffles::Window* _windowRef);
+	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 };

@@ -5,6 +5,7 @@ add_library(
     Waffles SHARED
 
     src/Waffles/Waffles.h
+    src/Waffles/Waffles.cpp
 
     src/Waffles/Cores/EngineCore.cpp
     src/Waffles/Cores/EngineCore.h

@@ -6,7 +6,7 @@ namespace Waffles{
     void EngineCore::load(){
         INIT_LOG("EngineCore Loading...");
         const char* appName = "Waffles-RTX-PBR";
-        _window = new Waffles::Window(720, 720.0 / (16.0 / 9.0), appName);
+        _window = new Waffles::Window(WINDOW_WIDTH, WINDOW_HEIGHT, appName);
         GLFWCallbacks::initCallBacks(_window);
         _rasterizedCore.load(_window);
        

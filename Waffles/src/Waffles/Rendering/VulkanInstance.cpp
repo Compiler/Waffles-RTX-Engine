@@ -47,6 +47,8 @@ namespace Waffles{
 
         vkDeviceWaitIdle(_logicalDevice);
         _cleanupSwapChain();
+        while(WINDOW_WIDTH == 0 || WINDOW_HEIGHT == 0) glfwWaitEvents();
+        vkDeviceWaitIdle(_logicalDevice);
 
         _createSwapChain();
         _createImageViews();
