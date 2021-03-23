@@ -12,6 +12,7 @@
 
 #include <entt/entt.hpp>
 #include <entt/entity/registry.hpp>
+#include <Waffles/Cores/RenderCore.h>
 
 namespace Waffles{
 
@@ -20,6 +21,7 @@ namespace Waffles{
         private:
             Window* _window;
             VulkanInstance _vkInstance;
+            Waffles::RenderCore _rasterizedCore;
 
 
 
@@ -28,7 +30,7 @@ namespace Waffles{
             void update();
             void render();
             void unload();
-            bool isRunning() const {return _window->isRunning();}
+            inline bool isRunning() const {return _window->isRunning();}
 
     };
 

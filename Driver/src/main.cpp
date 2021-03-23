@@ -1,11 +1,11 @@
 #include <Waffles/Waffles.h>
 #include <Waffles/Tools/Logging.h>
-#include <Waffles/Cores/RenderCore.h>
+#include <Waffles/Cores/EngineCore.h>
 int main(){
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
     WARN("Program begin");
-    Waffles::RenderCore core;
+    Waffles::EngineCore core;
     if(__DEBUG_MODE){
         WARN("DEBUG MODE ON");
     }else{
