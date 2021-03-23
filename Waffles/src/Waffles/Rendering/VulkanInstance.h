@@ -74,9 +74,14 @@ namespace Waffles{
             void _createFrameBuffers();
             void _createGraphicsCommandPool();
             void _createGraphicsCommandBuffers();
-            void _createSemaphores();
+            void _createSyncObjects();
 
-            VkSemaphore _s_imageAvailable, _s_renderFinished;
+
+            const int _MAX_FRAMES_IN_FLIGHT = 2;
+            size_t _currentFrame = 0;
+            std::vector<VkSemaphore> _s_imagesAvailable;
+            std::vector<VkSemaphore> _s_rendersFinished;
+            std::vector<VkFence> _f_inFlightFences;
 
 
 

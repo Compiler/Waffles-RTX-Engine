@@ -18,20 +18,24 @@ namespace Waffles{
         DEBUG_FUNC(_createGraphicsCommandPool());
         DEBUG_FUNC(_createGraphicsCommandPool());
         DEBUG_FUNC(_createGraphicsCommandBuffers());
-        DEBUG_FUNC(_createSemaphores());
+        DEBUG_FUNC(_createSyncObjects());
     }
 
 
     void VulkanInstance::render(){
+        vkWaitForFences(_logicalDevice, 1, &_f_inFlightFences[_currentFrame], VK_TRUE, UINT64_MAX);
+        vkResetFences(_logicalDevice, 1, &_f_inFlightFences[_currentFrame]);
+
+
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(_logicalDevice, _swapChain, UINT64_MAX, _s_imageAvailable, VK_NULL_HANDLE, &imageIndex);
+        vkAcquireNextImageKHR(_logicalDevice, _swapChain, UINT64_MAX, _s_imagesAvailable[_currentFrame], VK_NULL_HANDLE, &imageIndex);
 
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = {_s_imageAvailable};
-        VkSemaphore signalSemaphores[] = {_s_renderFinished};
+        VkSemaphore waitSemaphores[] = {_s_imagesAvailable[_currentFrame]};
+        VkSemaphore signalSemaphores[] = {_s_rendersFinished[_currentFrame]};
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;
         submitInfo.pWaitSemaphores = waitSemaphores;
@@ -41,7 +45,7 @@ namespace Waffles{
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
 
-        if (vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
+        if (vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _f_inFlightFences[_currentFrame]) != VK_SUCCESS) {
             ERROR("Failed to submit draw command buffer!");
         }
 
@@ -70,15 +74,26 @@ namespace Waffles{
 
         vkQueuePresentKHR(_presentationQueue, &presentInfo);
 
+        _currentFrame = (_currentFrame+1)% _MAX_FRAMES_IN_FLIGHT;
+
     }
 
-    void VulkanInstance::_createSemaphores(){
+    void VulkanInstance::_createSyncObjects(){
+        _f_inFlightFences.resize(_MAX_FRAMES_IN_FLIGHT);
+        _s_imagesAvailable.resize(_MAX_FRAMES_IN_FLIGHT);
+        _s_rendersFinished.resize(_MAX_FRAMES_IN_FLIGHT);
         VkSemaphoreCreateInfo semaphoreInfo{};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
-        if (vkCreateSemaphore(_logicalDevice, &semaphoreInfo, nullptr, &_s_imageAvailable) != VK_SUCCESS || vkCreateSemaphore(_logicalDevice, &semaphoreInfo, nullptr, &_s_renderFinished) != VK_SUCCESS) {
-
-           ERROR("Failed to create semaphores!");
+        VkFenceCreateInfo fenceInfo{};
+        fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+        for (size_t i = 0; i < _MAX_FRAMES_IN_FLIGHT; i++){
+            if (vkCreateSemaphore(_logicalDevice, &semaphoreInfo, nullptr, &_s_imagesAvailable[i]) != VK_SUCCESS || vkCreateSemaphore(_logicalDevice, &semaphoreInfo, nullptr, &_s_rendersFinished[i]) != VK_SUCCESS) {
+                ERROR("Failed to create semaphores at i = '%d'", i);
+            }
+            if (vkCreateFence(_logicalDevice, &fenceInfo, nullptr, &_f_inFlightFences[i]) != VK_SUCCESS) {
+                ERROR("Failed to create fence at i = '%d'", i);
+            }
         }
 
 
@@ -757,8 +772,12 @@ namespace Waffles{
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
         vkDeviceWaitIdle(_logicalDevice);//wait for queue operations to finish for _logicalDevice
-        vkDestroySemaphore(_logicalDevice, _s_imageAvailable, nullptr);
-        vkDestroySemaphore(_logicalDevice, _s_renderFinished, nullptr);
+        for (size_t i = 0; i < _MAX_FRAMES_IN_FLIGHT; i++) {
+            vkDestroySemaphore(_logicalDevice, _s_imagesAvailable[i], nullptr);
+            vkDestroySemaphore(_logicalDevice, _s_rendersFinished[i], nullptr);
+            vkDestroyFence(_logicalDevice, _f_inFlightFences[i], nullptr);
+            
+        }
         vkDestroyCommandPool(_logicalDevice, _graphicsCommandPool, nullptr);
         for (auto framebuffer : _swapChainFramebuffers) {
             vkDestroyFramebuffer(_logicalDevice, framebuffer, nullptr);
