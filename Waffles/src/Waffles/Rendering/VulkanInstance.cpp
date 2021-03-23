@@ -756,6 +756,7 @@ namespace Waffles{
     }
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
+        vkDeviceWaitIdle(_logicalDevice);//wait for queue operations to finish for _logicalDevice
         vkDestroySemaphore(_logicalDevice, _s_imageAvailable, nullptr);
         vkDestroySemaphore(_logicalDevice, _s_renderFinished, nullptr);
         vkDestroyCommandPool(_logicalDevice, _graphicsCommandPool, nullptr);
