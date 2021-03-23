@@ -3,14 +3,15 @@
 namespace Waffles{
     void VulkanInstance::load(GLFWwindow* window){
         uint32_t extensionCount = 0;
+        _windowRef = window;
         vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
         LOG("%d", extensionCount);
         DEBUG_FUNC(_createInstance("Waffles-RTX-Engine", "Waffles"));
         DEBUG_FUNC(_createDebugMessenger());
-        DEBUG_FUNC(_createSurface(window));
+        DEBUG_FUNC(_createSurface());
         DEBUG_FUNC(_setPhysicalDevice());
         DEBUG_FUNC(_createLogicalDevice());
-        DEBUG_FUNC(_createSwapChain(window));
+        DEBUG_FUNC(_createSwapChain());
         DEBUG_FUNC(_createImageViews());
         DEBUG_FUNC(_createRenderPass());
         DEBUG_FUNC(_createGraphicsPipeline());
@@ -22,12 +23,53 @@ namespace Waffles{
     }
 
 
+    void VulkanInstance::_cleanupSwapChain(){
+        for (size_t i = 0; i < _swapChainFramebuffers.size(); i++) {
+            vkDestroyFramebuffer(_logicalDevice, _swapChainFramebuffers[i], nullptr);
+        }
+
+        vkFreeCommandBuffers(_logicalDevice, _graphicsCommandPool, static_cast<uint32_t>(_graphicsCommandBuffers.size()), _graphicsCommandBuffers.data());
+
+        vkDestroyPipeline(_logicalDevice, _graphicsPipeline, nullptr);
+        vkDestroyPipelineLayout(_logicalDevice, _pipelineLayout, nullptr);
+        vkDestroyRenderPass(_logicalDevice, _renderPass, nullptr);
+
+        for (size_t i = 0; i < _swapChainImageViews.size(); i++) {
+            vkDestroyImageView(_logicalDevice, _swapChainImageViews[i], nullptr);
+        }
+
+        vkDestroySwapchainKHR(_logicalDevice, _swapChain, nullptr);
+
+    }
+
+
+    void VulkanInstance::recreateSwapChain(){
+
+        vkDeviceWaitIdle(_logicalDevice);
+        _cleanupSwapChain();
+
+        _createSwapChain();
+        _createImageViews();
+        _createRenderPass();
+        _createGraphicsPipeline();
+        _createFrameBuffers();
+        _createGraphicsCommandBuffers();
+
+    }
+
+
     void VulkanInstance::render(){
         vkWaitForFences(_logicalDevice, 1, &_f_inFlightFences[_currentFrame], VK_TRUE, UINT64_MAX);
 
 
+
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(_logicalDevice, _swapChain, UINT64_MAX, _s_imagesAvailable[_currentFrame], VK_NULL_HANDLE, &imageIndex);
+        VkResult result = vkAcquireNextImageKHR(_logicalDevice, _swapChain, UINT64_MAX, _s_imagesAvailable[_currentFrame], VK_NULL_HANDLE, &imageIndex);
+        if(result == VK_ERROR_OUT_OF_DATE_KHR){
+            recreateSwapChain();
+        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+            ERROR("failed to acquire swap chain image!");
+        }
         if(_f_imagesInFlight[imageIndex] != VK_NULL_HANDLE) vkWaitForFences(_logicalDevice, 1, &_f_imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
         _f_imagesInFlight[imageIndex] = _f_inFlightFences[_currentFrame];
 
@@ -45,7 +87,7 @@ namespace Waffles{
         submitInfo.pCommandBuffers = &_graphicsCommandBuffers[imageIndex];
         submitInfo.signalSemaphoreCount = 1;
         submitInfo.pSignalSemaphores = signalSemaphores;
-        
+
         vkResetFences(_logicalDevice, 1, &_f_inFlightFences[_currentFrame]);
 
         if (vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _f_inFlightFences[_currentFrame]) != VK_SUCCESS) {
@@ -599,12 +641,12 @@ namespace Waffles{
         return indices;
     }
 
-    void VulkanInstance::_createSwapChain(GLFWwindow* window){
+    void VulkanInstance::_createSwapChain(){
         SwapChainSupportDetails swapChainSupport = _querySwapChainSupport(_physicalDevice);
 
         VkSurfaceFormatKHR surfaceFormat = _chooseSwapSurfaceFormat(swapChainSupport.formats);
         VkPresentModeKHR presentMode = _chooseSwapPresentMode(swapChainSupport.presentModes);
-        VkExtent2D extent = _chooseSwapExtent(swapChainSupport.capabilities, window);
+        VkExtent2D extent = _chooseSwapExtent(swapChainSupport.capabilities, _windowRef);
 
         uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
         LOG("Swap chain contains %d images", imageCount);
@@ -679,12 +721,12 @@ namespace Waffles{
             return VK_PRESENT_MODE_FIFO_KHR;
     }
 
-    VkExtent2D VulkanInstance::_chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window){
+    VkExtent2D VulkanInstance::_chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities){
         if (capabilities.currentExtent.width != UINT32_MAX) {
             return capabilities.currentExtent;
         } else {
             int width, height;
-            glfwGetFramebufferSize(window, &width, &height);
+            glfwGetFramebufferSize(_windowRef, &width, &height);
             DEBUG("(%d, %d)", width, height);
             VkExtent2D actualExtent = {
                 static_cast<uint32_t>(width),
@@ -742,8 +784,8 @@ namespace Waffles{
 
     }
 
-    void VulkanInstance::_createSurface(GLFWwindow* window){
-        if (glfwCreateWindowSurface(_vulkanInstance, window, nullptr, &_surface) != VK_SUCCESS) {
+    void VulkanInstance::_createSurface(){
+        if (glfwCreateWindowSurface(_vulkanInstance, _windowRef, nullptr, &_surface) != VK_SUCCESS) {
             ERROR("failed to create window surface!");
         }
     }
@@ -775,6 +817,7 @@ namespace Waffles{
     }
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
+        _cleanupSwapChain();
         vkDeviceWaitIdle(_logicalDevice);//wait for queue operations to finish for _logicalDevice
         for (size_t i = 0; i < _MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(_logicalDevice, _s_imagesAvailable[i], nullptr);
@@ -782,17 +825,7 @@ namespace Waffles{
             vkDestroyFence(_logicalDevice, _f_inFlightFences[i], nullptr);
             
         }
-        vkDestroyCommandPool(_logicalDevice, _graphicsCommandPool, nullptr);
-        for (auto framebuffer : _swapChainFramebuffers) {
-            vkDestroyFramebuffer(_logicalDevice, framebuffer, nullptr);
-        }
-        vkDestroyPipeline(_logicalDevice, _graphicsPipeline, nullptr);
-        vkDestroyPipelineLayout(_logicalDevice, _pipelineLayout, nullptr);
-        vkDestroyRenderPass(_logicalDevice, _renderPass, nullptr);
-        for (auto imageView : _swapChainImageViews) {
-            vkDestroyImageView(_logicalDevice, imageView, nullptr);
-        }
-        vkDestroySwapchainKHR(_logicalDevice, _swapChain, nullptr);
+        
         if(enableValidationLayers) DestroyDebugUtilsMessengerEXT(_vulkanInstance, _debugMessenger, nullptr);
         vkDestroySurfaceKHR(_vulkanInstance, _surface, nullptr);
         vkDestroyDevice(_logicalDevice, nullptr);

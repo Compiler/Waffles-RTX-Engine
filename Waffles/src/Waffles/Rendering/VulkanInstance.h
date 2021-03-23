@@ -1,7 +1,6 @@
 #pragma once
 #include <Waffles/Waffles.h>
 #define GLFW_INCLUDE_VULKAN
-#include <Waffles/Rendering/Window.h>
 #include <Waffles/Startup/Startup.h>
 #include <Waffles/Tools/Logging.h>
 #include <Waffles/Tools/FileUtils/FileLoader.h>
@@ -16,7 +15,7 @@ const bool enableValidationLayers = true;
 const bool enableValidationLayers = false;
 #endif
 
-
+#include <Waffles/Rendering/Window.h>
 
 #define DEBUG_FUNC(x) INIT_LOG("----\tStarting %s", #x); x; LOG("----\tEnding %s", #x)
 namespace Waffles{
@@ -65,9 +64,9 @@ namespace Waffles{
             void _setPhysicalDevice();
             bool _isRTXEnabledGPU(VkPhysicalDevice);
             void _createLogicalDevice();
-            void _createSurface(GLFWwindow* window);
+            void _createSurface();
             bool _deviceSupportsExtensions(VkPhysicalDevice device);
-            void _createSwapChain(GLFWwindow* window);
+            void _createSwapChain();
             void _createImageViews();
             void _createRenderPass();
             void _createGraphicsPipeline();
@@ -75,6 +74,7 @@ namespace Waffles{
             void _createGraphicsCommandPool();
             void _createGraphicsCommandBuffers();
             void _createSyncObjects();
+            void _cleanupSwapChain();
 
 
             const int _MAX_FRAMES_IN_FLIGHT = 2;
@@ -90,7 +90,7 @@ namespace Waffles{
             SwapChainSupportDetails _querySwapChainSupport(VkPhysicalDevice device);
             VkSurfaceFormatKHR _chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
             VkPresentModeKHR _chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-            VkExtent2D _chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window);
+            VkExtent2D _chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
             QueueFamilyIndices _getQueueFamilies(VkPhysicalDevice);
 
@@ -117,6 +117,8 @@ namespace Waffles{
 
 
             VkClearValue _clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+            GLFWwindow* _windowRef;
+
 
         public:
 
@@ -126,6 +128,7 @@ namespace Waffles{
 
             void unload();
 
+            void recreateSwapChain();
 
         private:
             std::vector<const char*> getRequiredExtensions() {
