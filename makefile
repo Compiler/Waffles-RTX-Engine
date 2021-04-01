@@ -1,13 +1,15 @@
+BUILD_SCRIPTS_LOC = build_scripts\\
+
 all: main
 
 main:
-	build.bat
+	$(BUILD_SCRIPTS_LOC)build.bat
 
 launch:
-	build_run.bat
+	$(BUILD_SCRIPTS_LOC)build_run.bat
 
 run:
-	run.bat
+	$(BUILD_SCRIPTS_LOC)run.bat
 
 clean:
-	clean.bat
+	$(BUILD_SCRIPTS_LOC)clean.bat
