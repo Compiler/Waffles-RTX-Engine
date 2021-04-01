@@ -182,7 +182,7 @@ namespace Waffles{
 
             vkCmdBeginRenderPass(_graphicsCommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(_graphicsCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, _graphicsPipeline); //VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR
-            vkCmdDraw(_graphicsCommandBuffers[i], 3, 1, 0, 0);
+            vkCmdDraw(_graphicsCommandBuffers[i], 6, 1, 0, 0);
 
             vkCmdEndRenderPass(_graphicsCommandBuffers[i]);
             if(vkEndCommandBuffer(_graphicsCommandBuffers[i]) != VK_SUCCESS){
@@ -263,8 +263,10 @@ namespace Waffles{
     }
 
     void VulkanInstance::_createGraphicsPipeline(){
-        auto vertShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_vert.spv"));
-        auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_frag.spv"));
+        auto vertShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("pass6_vert.spv"));
+        auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("raymarch.spv"));
+        //auto vertShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_vert.spv"));
+        //auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_frag.spv"));
 
         VkShaderModule vertShaderModule = _createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = _createShaderModule(fragShaderCode);
