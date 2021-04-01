@@ -4,7 +4,9 @@
 #include <vector>
 #include <fstream>
 
-#define WAFFLES_INTERNAL(x)         "../Waffles/src/Resources/" x
+
+// We go back because this is from the binary directory, so we leave build and enter Waffles
+#define WAFFLES_INTERNAL(x)         "../Waffles/Resources/" x
 #define WAFFLES_INTERNAL_SHADER(x)  WAFFLES_INTERNAL("Shaders/") x
 #define WAFFLES_INTERNAL_SHADER_SPIRV(x)  WAFFLES_INTERNAL("Shader_SPIRV/") x
 #define WAFFLES_INTERNAL_TEXTURE(x) WAFFLES_INTERNAL("Textures/") x
