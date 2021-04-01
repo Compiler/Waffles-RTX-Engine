@@ -2,7 +2,17 @@
 
 ## How to use:
 
-### Window + MinGW64
+### Using build tools
+
+  - Run 
+    ```
+    > make
+    > make run
+    ```
+
+    - And thats it
+
+### Window + MinGW64 manually
 
   - Under Waffles-RTX-Engine, there is a CMakeLists.txt-- open it and change VULKAN_ROOT to point to your vulkan sdk path:
 
