@@ -13,6 +13,8 @@
 #include <entt/entity/registry.hpp>
 #include <Waffles/Cores/RenderCore.h>
 
+#include <Waffles/Rendering/Vertex/Vertex.h>
+
 namespace Waffles{
 
     class EngineCore{

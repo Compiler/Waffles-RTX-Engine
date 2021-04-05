@@ -57,23 +57,23 @@ namespace Waffles{
             std::vector<VkFramebuffer> _swapChainFramebuffers;
             VkCommandPool _graphicsCommandPool;
 
-            void _createInstance(const char* appName, const char* engineName);
-            void _createDebugMessenger();
-            bool _validatationLayersAssert();
-            void _setPhysicalDevice();
-            bool _isRTXEnabledGPU(VkPhysicalDevice);
-            void _createLogicalDevice();
-            void _createSurface();
-            bool _deviceSupportsExtensions(VkPhysicalDevice device);
-            void _createSwapChain();
-            void _createImageViews();
-            void _createRenderPass();
-            void _createGraphicsPipeline();
-            void _createFrameBuffers();
-            void _createGraphicsCommandPool();
-            void _createGraphicsCommandBuffers();
-            void _createSyncObjects();
-            void _cleanupSwapChain();
+            inline void _createInstance(const char* appName, const char* engineName);
+            inline void _createDebugMessenger();
+            inline bool _validatationLayersAssert();
+            inline void _setPhysicalDevice();
+            inline bool _isRTXEnabledGPU(VkPhysicalDevice);
+            inline void _createLogicalDevice();
+            inline void _createSurface();
+            inline bool _deviceSupportsExtensions(VkPhysicalDevice device);
+            inline void _createSwapChain();
+            inline void _createImageViews();
+            inline void _createRenderPass();
+            inline void _createGraphicsPipeline();
+            inline void _createFrameBuffers();
+            inline void _createGraphicsCommandPool();
+            inline void _createGraphicsCommandBuffers();
+            inline void _createSyncObjects();
+            inline void _cleanupSwapChain();
 
 
             const int _MAX_FRAMES_IN_FLIGHT = 2;
