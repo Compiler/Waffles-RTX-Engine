@@ -4,6 +4,7 @@
 #include <Waffles/Startup/Startup.h>
 #include <Waffles/Tools/FileUtils/FileLoader.h>
 #include <Waffles/Tools/DebugUtils/VkDebugUtils.h>
+#include <Waffles/Rendering/Vertex/Vertex.h>
 #include <cstring>
 #include <string>
 #include <set>
@@ -56,6 +57,8 @@ namespace Waffles{
             VkPipeline _graphicsPipeline;
             std::vector<VkFramebuffer> _swapChainFramebuffers;
             VkCommandPool _graphicsCommandPool;
+            VkBuffer _vertexBuffer;
+            VkDeviceMemory _vertexBufferMemory;
 
             inline void _createInstance(const char* appName, const char* engineName);
             inline void _createDebugMessenger();
@@ -74,6 +77,20 @@ namespace Waffles{
             inline void _createGraphicsCommandBuffers();
             inline void _createSyncObjects();
             inline void _cleanupSwapChain();
+            inline void _createVertexBuffers();
+
+
+            uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+                VkPhysicalDeviceMemoryProperties memProperties;
+                vkGetPhysicalDeviceMemoryProperties(_physicalDevice, &memProperties);
+                for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+                     if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties){
+                        return i;
+                    }
+                }
+
+                ERROR("failed to find suitable memory type!");
+            }
 
 
             const int _MAX_FRAMES_IN_FLIGHT = 2;
@@ -115,7 +132,7 @@ namespace Waffles{
 
 
 
-            VkClearValue _clearColor = {0.0f, 0.0f, 0.0f, 1.0f};
+            VkClearValue _clearColor = {255.0f / 255.0f, 105.0f / 255.0f, 180.0f / 255.0f, 1.0f};
             GLFWwindow* _windowRef;
 
 
