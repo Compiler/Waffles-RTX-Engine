@@ -24,6 +24,33 @@ namespace Waffles{
         
     }
 
+
+    void VulkanInstance::_createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory){
+        VkBufferCreateInfo bufferInfo{};
+        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        bufferInfo.usage = usage;
+        bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        bufferInfo.size = size;
+
+        if (vkCreateBuffer(_logicalDevice, &bufferInfo, nullptr, &_vertexBuffer) != VK_SUCCESS) {
+            ERROR("failed to create vertex buffer!");
+        }
+
+        VkMemoryRequirements memRequirements;
+        vkGetBufferMemoryRequirements(_logicalDevice, _vertexBuffer, &memRequirements);
+        VkMemoryAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.allocationSize = memRequirements.size;
+        allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+        if (vkAllocateMemory(_logicalDevice, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
+            ERROR("failed to allocate vertex buffer memory!");
+        }
+        vkBindBufferMemory(_logicalDevice, _vertexBuffer, bufferMemory, 0);
+
+
+    }
+
+
     void VulkanInstance::_createVertexBuffers(){
         static const float sz = 0.95;
         static const std::vector<Vertex_Tmp> vertices = {
@@ -35,33 +62,23 @@ namespace Waffles{
             {{ -sz, sz,     0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
             {{ -sz, -sz,    0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
         };
-        VkBufferCreateInfo bufferInfo{};
-        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-        bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-        bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        bufferInfo.size = sizeof(vertices[0]) * vertices.size();
-
-        if (vkCreateBuffer(_logicalDevice, &bufferInfo, nullptr, &_vertexBuffer) != VK_SUCCESS) {
-            ERROR("failed to create vertex buffer!");
-        }
 
 
-        VkMemoryRequirements memRequirements;
-        vkGetBufferMemoryRequirements(_logicalDevice, _vertexBuffer, &memRequirements);
-        VkMemoryAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.allocationSize = memRequirements.size;
-        allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-        if (vkAllocateMemory(_logicalDevice, &allocInfo, nullptr, &_vertexBufferMemory) != VK_SUCCESS) {
-            ERROR("failed to allocate vertex buffer memory!");
-        }
-        vkBindBufferMemory(_logicalDevice, _vertexBuffer, _vertexBufferMemory, 0);
+        VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+       
+        VkBuffer stagingBuffer;
+        VkDeviceMemory stagingBufferMemory;
+        _createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
+
+        
 
         void* data;
-        vkMapMemory(_logicalDevice, _vertexBufferMemory, 0, bufferInfo.size, 0, &data);
-        memcpy(data, vertices.data(), (size_t) bufferInfo.size);
-        vkUnmapMemory(_logicalDevice, _vertexBufferMemory);
+        vkMapMemory(_logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+        memcpy(data, vertices.data(), (size_t) bufferSize);
+        vkUnmapMemory(_logicalDevice, stagingBufferMemory);
+        _createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _vertexBuffer, _vertexBufferMemory);
+
 
     }
 
@@ -309,9 +326,7 @@ namespace Waffles{
 
     void VulkanInstance::_createGraphicsPipeline(){
         auto vertShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_vert.spv"));
-        //auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("raymarch.spv"));
-        auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("ray_marching_frag.spv"));
-        //auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_frag.spv"));
+        auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("RayMarching_frag.spv"));
 
         VkShaderModule vertShaderModule = _createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = _createShaderModule(fragShaderCode);

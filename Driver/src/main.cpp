@@ -1,7 +1,10 @@
 #include <Waffles/Waffles.h>
 #include <Waffles/Tools/Logging.h>
 #include <Waffles/Cores/EngineCore.h>
+#include <Waffles/Rendering/Vertex/Vertex.h>
+
 int main(){
+
     uint32_t layerCount;
     vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
     WARN("Program begin");
