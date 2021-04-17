@@ -80,7 +80,7 @@ namespace Waffles{
             inline void _createVertexBuffers();
 
             inline void _createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-
+            inline void _copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
             uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
                 VkPhysicalDeviceMemoryProperties memProperties;
                 vkGetPhysicalDeviceMemoryProperties(_physicalDevice, &memProperties);
@@ -138,6 +138,15 @@ namespace Waffles{
 
 
         public:
+            inline static float sz = 0.95;
+            std::vector<Vertex_Tmp> vertices = {
+                {glm::vec4(-sz, -sz, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)},
+                {glm::vec4( sz, -sz, 0.0f, 1.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)},
+                {glm::vec4( sz,  sz, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)}, 
+                {glm::vec4( sz,  sz, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)},
+                {glm::vec4(-sz,  sz, 0.0f, 1.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)},
+                {glm::vec4(-sz, -sz, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)},
+            };
 
             void load(GLFWwindow* window);
 
