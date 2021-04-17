@@ -10,12 +10,12 @@ namespace Waffles{
         GLFWCallbacks::initCallBacks(_window);
         _rasterizedCore.load(_window);
        
-        GeneralVertex<glm::vec2, glm::vec3, float> vertex_info(glm::vec2(1, 1), glm::vec3(2,2,2), 3);
+        GeneralVertex<glm::vec2, glm::vec2, float> vertex_info(glm::vec2(1, 1), glm::vec2(2,2), 3);
 
         auto e1 = vertex_info.element;
         auto e2 = vertex_info.recurse.element;
         auto e3 = vertex_info.recurse.recurse.element;
-        DEBUG("(%f, %f), (%f, %f, %f), %f", e1.x, e1.y, e2.x, e2.y, e2.z, e3);
+        DEBUG("(%f, %f), (%f, %f), %f", e1.x, e1.y, e2.x, e2.y, e3);
 
     }
 

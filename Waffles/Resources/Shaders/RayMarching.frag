@@ -1,7 +1,7 @@
 #version 460
 #extension GL_ARB_separate_shader_objects : enable
 
-layout(location = 0) in vec3 fragColor;
+layout(location = 0) in vec4 o_color;
 layout(location = 0) out vec4 outColor;
 //uniform float u_time;
 
@@ -224,11 +224,11 @@ vec3 phongIllumination(vec3 k_a, vec3 k_d, vec3 k_s, float alpha, vec3 p, vec3 e
 vec2 iResolution = vec2(640, 480);
 void main(){
     vec2 uv = (gl_FragCoord.xy - 0.5 * iResolution.xy)/iResolution.y;
-    uv.y =1.0 - uv.y;
+    uv.y = -uv.y;
 	vec3 resultingColor = vec3(0);
     
     Ray cameraRay;
-    vec3 cameraPos = vec3(0., 3., -2.);vec3 lookAt = vec3(0., 2.5, 0.); float zoom = 1.;
+    vec3 cameraPos = vec3(0., 3., -5.);vec3 lookAt = vec3(0., 2.5, 0.); float zoom = 1.;
     cameraRay = getRay(uv, cameraPos, lookAt, zoom);
     
     
@@ -241,5 +241,5 @@ void main(){
     
     vec3 color = phongIllumination(K_a, rayMarch.color, K_s, shininess, point, cameraRay.origin);
     //resultingColor = getNormal(point); //for visualizing normals
-    outColor =  vec4(color,1.0);
+    outColor =  vec4(color, o_color.a);
 }

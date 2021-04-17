@@ -18,8 +18,108 @@ namespace Waffles{
         DEBUG_FUNC(_createFrameBuffers());
         DEBUG_FUNC(_createGraphicsCommandPool());
         DEBUG_FUNC(_createGraphicsCommandPool());
+        DEBUG_FUNC(_createVertexBuffers());
         DEBUG_FUNC(_createGraphicsCommandBuffers());
         DEBUG_FUNC(_createSyncObjects());
+        
+    }
+
+
+    void VulkanInstance::_createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory){
+        VkBufferCreateInfo bufferInfo{};
+        bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        bufferInfo.usage = usage;
+        bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        bufferInfo.size = size;
+
+        if (vkCreateBuffer(_logicalDevice, &bufferInfo, nullptr, &_vertexBuffer) != VK_SUCCESS) {
+            ERROR("failed to create vertex buffer!");
+        }
+
+        VkMemoryRequirements memRequirements;
+        vkGetBufferMemoryRequirements(_logicalDevice, _vertexBuffer, &memRequirements);
+        VkMemoryAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.allocationSize = memRequirements.size;
+        allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+        if (vkAllocateMemory(_logicalDevice, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
+            ERROR("failed to allocate vertex buffer memory!");
+        }
+        vkBindBufferMemory(_logicalDevice, _vertexBuffer, bufferMemory, 0);
+
+
+    }
+
+
+    void VulkanInstance::_createVertexBuffers(){
+        static const float sz = 0.95;
+        // static const std::vector<Vertex_Tmp> vertices = {
+        //     {{ -sz, -sz,    0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+        //     {{  sz, -sz,    0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+        //     {{  sz, sz,     0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+
+        //     {{  sz, sz,     0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+        //     {{ -sz, sz,     0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+        //     {{ -sz, -sz,    0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+        // };
+
+        
+
+        VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+       
+        VkBuffer stagingBuffer;
+        VkDeviceMemory stagingBufferMemory;
+        _createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+
+        
+
+        void* data;
+        vkMapMemory(_logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+        memcpy(data, vertices.data(), (size_t) bufferSize);
+        vkUnmapMemory(_logicalDevice, stagingBufferMemory);
+        //_createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _vertexBuffer, _vertexBufferMemory);
+        //_copyBuffer(stagingBuffer, _vertexBuffer, bufferSize);
+        //vkDestroyBuffer(_logicalDevice, stagingBuffer, nullptr);
+        //vkFreeMemory(_logicalDevice, stagingBufferMemory, nullptr);
+
+    }
+
+    void VulkanInstance::_copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size){
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandPool = _graphicsCommandPool;
+        allocInfo.commandBufferCount = 1;
+
+        VkCommandBuffer commandBuffer;
+        vkAllocateCommandBuffers(_logicalDevice, &allocInfo, &commandBuffer);
+
+
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+        vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+        VkBufferCopy copyRegion{};
+        copyRegion.srcOffset = 0;
+        copyRegion.dstOffset = 0;
+        copyRegion.size = size;
+        vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+        vkEndCommandBuffer(commandBuffer);
+
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffer;
+
+        vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+        vkQueueWaitIdle(_graphicsQueue);
+        vkFreeCommandBuffers(_logicalDevice, _graphicsCommandPool, 1, &commandBuffer);
+
+
     }
 
 
@@ -182,6 +282,9 @@ namespace Waffles{
 
             vkCmdBeginRenderPass(_graphicsCommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(_graphicsCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, _graphicsPipeline); //VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR
+            VkBuffer vertexBuffers[] = {_vertexBuffer};
+            VkDeviceSize offsets[] = {0};
+            vkCmdBindVertexBuffers(_graphicsCommandBuffers[i], 0, 1, vertexBuffers, offsets);
             vkCmdDraw(_graphicsCommandBuffers[i], 6, 1, 0, 0);
 
             vkCmdEndRenderPass(_graphicsCommandBuffers[i]);
@@ -263,10 +366,8 @@ namespace Waffles{
     }
 
     void VulkanInstance::_createGraphicsPipeline(){
-        auto vertShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("pass6_vert.spv"));
-        auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("raymarch.spv"));
-        //auto vertShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_vert.spv"));
-        //auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_frag.spv"));
+        auto vertShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("passthrough_vert.spv"));
+        auto fragShaderCode = Waffles::FileLoader::readFile(WAFFLES_INTERNAL_SHADER_SPIRV("RayMarching_frag.spv"));
 
         VkShaderModule vertShaderModule = _createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = _createShaderModule(fragShaderCode);
@@ -287,12 +388,15 @@ namespace Waffles{
         VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
 
 
+        auto bindingDescription = Vertex_Tmp::getBindingDescription();
+        auto attributeDescriptions = Vertex_Tmp::getAttributeDescriptions();
+
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        vertexInputInfo.vertexBindingDescriptionCount = 0;
-        vertexInputInfo.pVertexBindingDescriptions = nullptr; // Optional
-        vertexInputInfo.vertexAttributeDescriptionCount = 0;
-        vertexInputInfo.pVertexAttributeDescriptions = nullptr; // Optional
+        vertexInputInfo.vertexBindingDescriptionCount = 1;
+        vertexInputInfo.vertexAttributeDescriptionCount = (uint32_t)(attributeDescriptions.size());
+        vertexInputInfo.pVertexBindingDescriptions = &bindingDescription; 
+        vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data(); 
 
         VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
         inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -822,6 +926,8 @@ namespace Waffles{
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
         _cleanupSwapChain();
+        vkDestroyBuffer(_logicalDevice,_vertexBuffer, nullptr);
+        vkFreeMemory(_logicalDevice, _vertexBufferMemory, nullptr);
         vkDeviceWaitIdle(_logicalDevice);//wait for queue operations to finish for _logicalDevice
         for (size_t i = 0; i < _MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(_logicalDevice, _s_imagesAvailable[i], nullptr);
