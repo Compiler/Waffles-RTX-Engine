@@ -32,12 +32,12 @@ namespace Waffles{
         bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         bufferInfo.size = size;
 
-        if (vkCreateBuffer(_logicalDevice, &bufferInfo, nullptr, &_vertexBuffer) != VK_SUCCESS) {
+        if (vkCreateBuffer(_logicalDevice, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
             ERROR("failed to create vertex buffer!");
         }
 
         VkMemoryRequirements memRequirements;
-        vkGetBufferMemoryRequirements(_logicalDevice, _vertexBuffer, &memRequirements);
+        vkGetBufferMemoryRequirements(_logicalDevice, buffer, &memRequirements);
         VkMemoryAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.allocationSize = memRequirements.size;
@@ -45,26 +45,13 @@ namespace Waffles{
         if (vkAllocateMemory(_logicalDevice, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
             ERROR("failed to allocate vertex buffer memory!");
         }
-        vkBindBufferMemory(_logicalDevice, _vertexBuffer, bufferMemory, 0);
+        vkBindBufferMemory(_logicalDevice, buffer, bufferMemory, 0);
 
 
     }
 
 
     void VulkanInstance::_createVertexBuffers(){
-        static const float sz = 0.95;
-        // static const std::vector<Vertex_Tmp> vertices = {
-        //     {{ -sz, -sz,    0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        //     {{  sz, -sz,    0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-        //     {{  sz, sz,     0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
-
-        //     {{  sz, sz,     0.0f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
-        //     {{ -sz, sz,     0.0f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
-        //     {{ -sz, -sz,    0.0f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
-        // };
-
-        
-
         VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
        
         VkBuffer stagingBuffer;
@@ -78,10 +65,12 @@ namespace Waffles{
         vkMapMemory(_logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
         memcpy(data, vertices.data(), (size_t) bufferSize);
         vkUnmapMemory(_logicalDevice, stagingBufferMemory);
-        //_createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _vertexBuffer, _vertexBufferMemory);
-        //_copyBuffer(stagingBuffer, _vertexBuffer, bufferSize);
-        //vkDestroyBuffer(_logicalDevice, stagingBuffer, nullptr);
-        //vkFreeMemory(_logicalDevice, stagingBufferMemory, nullptr);
+        
+        _createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _vertexBuffer, _vertexBufferMemory);
+        _copyBuffer(stagingBuffer, _vertexBuffer, bufferSize);
+        
+        vkDestroyBuffer(_logicalDevice, stagingBuffer, nullptr);
+        vkFreeMemory(_logicalDevice, stagingBufferMemory, nullptr);
 
     }
 
@@ -91,7 +80,6 @@ namespace Waffles{
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandPool = _graphicsCommandPool;
         allocInfo.commandBufferCount = 1;
-
         VkCommandBuffer commandBuffer;
         vkAllocateCommandBuffers(_logicalDevice, &allocInfo, &commandBuffer);
 
@@ -103,8 +91,8 @@ namespace Waffles{
         vkBeginCommandBuffer(commandBuffer, &beginInfo);
 
         VkBufferCopy copyRegion{};
-        copyRegion.srcOffset = 0;
-        copyRegion.dstOffset = 0;
+        //copyRegion.srcOffset = 0;
+        //copyRegion.dstOffset = 0;
         copyRegion.size = size;
         vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
         vkEndCommandBuffer(commandBuffer);
@@ -117,6 +105,7 @@ namespace Waffles{
 
         vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
         vkQueueWaitIdle(_graphicsQueue);
+
         vkFreeCommandBuffers(_logicalDevice, _graphicsCommandPool, 1, &commandBuffer);
 
 
