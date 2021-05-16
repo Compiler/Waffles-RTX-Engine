@@ -59,6 +59,8 @@ namespace Waffles{
             VkCommandPool _graphicsCommandPool;
             VkBuffer _vertexBuffer;
             VkDeviceMemory _vertexBufferMemory;
+            VkBuffer _indexBuffer;
+            VkDeviceMemory _indexBufferMemory;
 
             inline void _createInstance(const char* appName, const char* engineName);
             inline void _createDebugMessenger();
@@ -78,6 +80,7 @@ namespace Waffles{
             inline void _createSyncObjects();
             inline void _cleanupSwapChain();
             inline void _createVertexBuffers();
+            inline void _createIndexBuffers();
 
             inline void _createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
             inline void _copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
@@ -141,11 +144,13 @@ namespace Waffles{
             inline static float sz = 0.95;
             std::vector<Vertex_Tmp> vertices = {
                 {glm::vec4(-sz, -sz, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)},
-                {glm::vec4( sz, -sz, 0.0f, 1.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)},
-                {glm::vec4( sz,  sz, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)}, 
-                {glm::vec4( sz,  sz, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)},
-                {glm::vec4(-sz,  sz, 0.0f, 1.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f)},
-                {glm::vec4(-sz, -sz, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)},
+                {glm::vec4(sz, -sz, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)},
+                {glm::vec4(sz, sz, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)},
+                {glm::vec4(-sz, sz, 0.0f, 1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)},
+            };
+
+            std::vector<uint16_t> indices = {
+                0, 1, 2, 2, 3, 0
             };
 
             void load(GLFWwindow* window);

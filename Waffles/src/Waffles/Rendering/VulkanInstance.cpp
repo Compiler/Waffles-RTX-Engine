@@ -19,9 +19,30 @@ namespace Waffles{
         DEBUG_FUNC(_createGraphicsCommandPool());
         DEBUG_FUNC(_createGraphicsCommandPool());
         DEBUG_FUNC(_createVertexBuffers());
+        DEBUG_FUNC(_createIndexBuffers());
         DEBUG_FUNC(_createGraphicsCommandBuffers());
         DEBUG_FUNC(_createSyncObjects());
         
+    }
+
+    void VulkanInstance::_createIndexBuffers() {
+        VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+        VkBuffer stagingBuffer;
+        VkDeviceMemory stagingBufferMemory;
+        _createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+        void* data;
+        vkMapMemory(_logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+        memcpy(data, indices.data(), (size_t) bufferSize);
+        vkUnmapMemory(_logicalDevice, stagingBufferMemory);
+
+        _createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _indexBuffer, _indexBufferMemory);
+
+        _copyBuffer(stagingBuffer, _indexBuffer, bufferSize);
+
+        vkDestroyBuffer(_logicalDevice, stagingBuffer, nullptr);
+        vkFreeMemory(_logicalDevice, stagingBufferMemory, nullptr);
     }
 
 
@@ -273,8 +294,12 @@ namespace Waffles{
             vkCmdBindPipeline(_graphicsCommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, _graphicsPipeline); //VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR
             VkBuffer vertexBuffers[] = {_vertexBuffer};
             VkDeviceSize offsets[] = {0};
+
+
             vkCmdBindVertexBuffers(_graphicsCommandBuffers[i], 0, 1, vertexBuffers, offsets);
-            vkCmdDraw(_graphicsCommandBuffers[i], 6, 1, 0, 0);
+            vkCmdBindIndexBuffer(_graphicsCommandBuffers[i], _indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+            //vkCmdDraw(_graphicsCommandBuffers[i], 6, 1, 0, 0);
+            vkCmdDrawIndexed(_graphicsCommandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
             vkCmdEndRenderPass(_graphicsCommandBuffers[i]);
             if(vkEndCommandBuffer(_graphicsCommandBuffers[i]) != VK_SUCCESS){
@@ -915,7 +940,9 @@ namespace Waffles{
     void VulkanInstance::unload(){
         UNLOAD_LOG("Unloading VulkanInstance...");
         _cleanupSwapChain();
-        vkDestroyBuffer(_logicalDevice,_vertexBuffer, nullptr);
+        vkDestroyBuffer(_logicalDevice, _indexBuffer, nullptr);
+        vkFreeMemory(_logicalDevice, _indexBufferMemory, nullptr);
+        vkDestroyBuffer(_logicalDevice, _vertexBuffer, nullptr);
         vkFreeMemory(_logicalDevice, _vertexBufferMemory, nullptr);
         vkDeviceWaitIdle(_logicalDevice);//wait for queue operations to finish for _logicalDevice
         for (size_t i = 0; i < _MAX_FRAMES_IN_FLIGHT; i++) {
